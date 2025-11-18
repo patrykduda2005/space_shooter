@@ -1,3 +1,4 @@
+require 'ecc/ecc'
 newoption
 {
     trigger = "graphics",
