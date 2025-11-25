@@ -8,7 +8,8 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 */
 
 #include "raylib.h"
-
+#include "ecs.h"
+#include "components.h"
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
 int main ()
@@ -23,7 +24,11 @@ int main ()
 	SearchAndSetResourceDir("resources");
 
 	// Load a texture from the resources directory
-	Texture wabbit = LoadTexture("wabbit_alpha.png");
+	//Texture wabbit = LoadTexture("wabbit_alpha.png");
+    Entity* rabbit = entities->new_entity();
+    rabbit->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
+    rabbit->add_component<Position>({.x = 400, .y = 200});
+    rabbit->add_component<Gravity>({.g = 2.0});
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
@@ -38,15 +43,16 @@ int main ()
 		DrawText("Hello Raylib", 200,200,20,WHITE);
 
 		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
-		
+		//DrawTexture(wabbit, 400, 200, WHITE);
+	    updateGravity();	
+        renderThings();
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
 
 	// cleanup
 	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
+	//UnloadTexture(wabbit);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();
