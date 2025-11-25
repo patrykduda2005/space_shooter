@@ -7,12 +7,29 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 */
 
+#include <iostream>
 #include "raylib.h"
+#include "ecs.h"
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
+typedef struct {
+    float g;
+} Gravity;
+
+typedef struct {
+    float x;
+    float y;
+} Position;
+
 int main ()
 {
+
+    Entity* statek = entities->new_entity();
+    statek->add_component<Gravity>({.g = 0.9});
+    statek->add_component<Position>({.x = 0.0, .y = 10.0});
+    std::cout << statek->get_component<Gravity>()->g;
+    return 0;
 	// Tell the window to use vsync and work on high DPI displays
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
