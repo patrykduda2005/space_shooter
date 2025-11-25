@@ -5,7 +5,7 @@
 typedef struct {
     float g;
 } Gravity;
-void updateGravity();
+void updateGravity(float d);
 
 typedef struct {
     float x;
@@ -15,4 +15,4 @@ typedef struct {
 typedef struct {
     Texture txt;
 } Render;
-void renderThings();
+void renderThings(float d);

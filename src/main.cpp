@@ -33,6 +33,7 @@ int main ()
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
+        float d = GetFrameTime();
 		// drawing
 		BeginDrawing();
 
@@ -44,8 +45,8 @@ int main ()
 
 		// draw our texture to the screen
 		//DrawTexture(wabbit, 400, 200, WHITE);
-	    updateGravity();	
-        renderThings();
+	    updateGravity(d);	
+        renderThings(d);
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}

@@ -1,17 +1,17 @@
 #include "components.h"
 
-void updateGravity() {
+void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto grav = ent->get_component<Gravity>();
         auto pos = ent->get_component<Position>();
         if (pos && grav) {
-            pos->y += grav->g;
+            pos->y += grav->g * d;
         }
     }
 }
 
-void renderThings() {
+void renderThings(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto ren = ent->get_component<Render>();
