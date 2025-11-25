@@ -24,3 +24,7 @@ typedef struct {
     float westSpeed;
 } ArrowMovement;
 void arrowMovement(float d);
+
+typedef struct {
+} RestrictToWorld;
+void restrictToWorld(float d);

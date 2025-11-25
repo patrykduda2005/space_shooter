@@ -32,6 +32,7 @@ int main ()
     rabbit->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
     rabbit->add_component<Position>({.x = 500, .y = 700});
     rabbit->add_component<ArrowMovement>({0, 400, 0, 400});
+    rabbit->add_component<RestrictToWorld>({});
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
@@ -51,6 +52,7 @@ int main ()
 	    updateGravity(d);	
         renderThings(d);
         arrowMovement(d);
+        restrictToWorld(d);
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
