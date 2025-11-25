@@ -10,15 +10,18 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "raylib.h"
 #include "ecs.h"
 #include "components.h"
+#include "resources.h"
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
 int main ()
 {
+    initResources();
 	// Tell the window to use vsync and work on high DPI displays
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
 	// Create the window and OpenGL context
-	InitWindow(1000, 800, "Hello Raylib");
+    auto worldBorder = resources->get_component<WorldBorder>();
+	InitWindow(worldBorder->width, worldBorder->height, "Hello Raylib");
 
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
