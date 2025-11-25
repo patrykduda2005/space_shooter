@@ -14,8 +14,8 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 void updateGravity() {
-    for (int i = 0; i < entities->ents.size(); i++) {
-        auto ent = entities->ents[i];
+    for (int i = 0; i < entities->get().size(); i++) {
+        auto ent = entities->get()[i];
         auto grav = ent->get_component<Gravity>();
         auto pos = ent->get_component<Position>();
         if (pos && grav) {
@@ -25,8 +25,8 @@ void updateGravity() {
 }
 
 void renderThings() {
-    for (int i = 0; i < entities->ents.size(); i++) {
-        auto ent = entities->ents[i];
+    for (int i = 0; i < entities->get().size(); i++) {
+        auto ent = entities->get()[i];
         auto ren = ent->get_component<Render>();
         auto pos = ent->get_component<Position>();
         if (ren && pos) {

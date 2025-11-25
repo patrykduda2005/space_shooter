@@ -38,10 +38,11 @@ class Entity {
 };
 
 class Entities {
-    public:
     std::vector<Entity*> ents;
+    public:
     Entities() {};
     Entity* new_entity();
+    std::vector<Entity*> get();
 };
 
 static Entities *entities = new Entities();
