@@ -10,25 +10,37 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include <iostream>
 #include "raylib.h"
 #include "ecs.h"
+#include "components.h"
 
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
-
-typedef struct {
-    float g;
-} Gravity;
-
-typedef struct {
-    float x;
-    float y;
-} Position;
+void updateGravity() {
+    for (int i = 0; i < entities->ents.size(); i++) {
+        auto ent = entities->ents[i];
+        auto grav = ent->get_component<Gravity>();
+        auto pos = ent->get_component<Position>();
+        if (pos && grav) {
+            pos->y -= grav->g;
+        }
+    }
+}
 
 int main ()
 {
-
+    // Tworzenie nowego entity
     Entity* statek = entities->new_entity();
+    // Dodanie componentow do statku
     statek->add_component<Gravity>({.g = 0.9});
     statek->add_component<Position>({.x = 0.0, .y = 10.0});
-    std::cout << statek->get_component<Gravity>()->g;
+
+    std::cout << "Wypisanie wartosci aktualnych" << std::endl;
+    std::cout << statek->get_component<Gravity>()->g << std::endl;
+    std::cout << statek->get_component<Position>()->y << std::endl;
+
+    updateGravity();
+
+    std::cout << "Wypisanie wartosci aktualnych" << std::endl;
+    std::cout << statek->get_component<Gravity>()->g << std::endl;
+    std::cout << statek->get_component<Position>()->y << std::endl;
     return 0;
 	// Tell the window to use vsync and work on high DPI displays
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
