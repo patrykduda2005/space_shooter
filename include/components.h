@@ -16,3 +16,11 @@ typedef struct {
     Texture txt;
 } Render;
 void renderThings(float d);
+
+typedef struct {
+    float northSpeed;
+    float eastSpeed;
+    float southSpeed;
+    float westSpeed;
+} ArrowMovement;
+void arrowMovement(float d);
