@@ -19,29 +19,24 @@ void updateGravity() {
         auto grav = ent->get_component<Gravity>();
         auto pos = ent->get_component<Position>();
         if (pos && grav) {
-            pos->y -= grav->g;
+            pos->y += grav->g;
+        }
+    }
+}
+
+void renderThings() {
+    for (int i = 0; i < entities->ents.size(); i++) {
+        auto ent = entities->ents[i];
+        auto ren = ent->get_component<Render>();
+        auto pos = ent->get_component<Position>();
+        if (ren && pos) {
+            DrawTexture(ren->txt, pos->x, pos->y, WHITE);
         }
     }
 }
 
 int main ()
 {
-    // Tworzenie nowego entity
-    Entity* statek = entities->new_entity();
-    // Dodanie componentow do statku
-    statek->add_component<Gravity>({.g = 0.9});
-    statek->add_component<Position>({.x = 0.0, .y = 10.0});
-
-    std::cout << "Wypisanie wartosci aktualnych" << std::endl;
-    std::cout << statek->get_component<Gravity>()->g << std::endl;
-    std::cout << statek->get_component<Position>()->y << std::endl;
-
-    updateGravity();
-
-    std::cout << "Wypisanie wartosci aktualnych" << std::endl;
-    std::cout << statek->get_component<Gravity>()->g << std::endl;
-    std::cout << statek->get_component<Position>()->y << std::endl;
-    return 0;
 	// Tell the window to use vsync and work on high DPI displays
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
@@ -52,7 +47,11 @@ int main ()
 	SearchAndSetResourceDir("resources");
 
 	// Load a texture from the resources directory
-	Texture wabbit = LoadTexture("wabbit_alpha.png");
+	//Texture wabbit = LoadTexture("wabbit_alpha.png");
+    Entity* rabbit = entities->new_entity();
+    rabbit->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
+    rabbit->add_component<Position>({.x = 400, .y = 200});
+    rabbit->add_component<Gravity>({.g = 2.0});
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
@@ -67,15 +66,16 @@ int main ()
 		DrawText("Hello Raylib", 200,200,20,WHITE);
 
 		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
-		
+		//DrawTexture(wabbit, 400, 200, WHITE);
+	    updateGravity();	
+        renderThings();
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
 
 	// cleanup
 	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
+	//UnloadTexture(wabbit);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();
