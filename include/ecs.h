@@ -45,4 +45,4 @@ class Entities {
 };
 
 static Entities *entities = new Entities();
-#include "ecs.tpp"
+#include "ecs.ipp"
