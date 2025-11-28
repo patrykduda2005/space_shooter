@@ -16,3 +16,13 @@ typedef struct {
     Texture txt;
 } Render;
 void renderThings(float d);
+
+typedef struct{
+    float cooldown;
+} Shooting;
+void shoot();
+
+
+
+
+

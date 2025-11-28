@@ -25,6 +25,8 @@ Entity* Entities::new_entity() {
     return ent;
 }
 
+
+
 std::vector<Entity*> Entities::get() {
     return this->ents;
 }

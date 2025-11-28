@@ -30,8 +30,10 @@ int main ()
 	//Texture wabbit = LoadTexture("wabbit_alpha.png");
     Entity* rabbit = entities->new_entity();
     rabbit->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
-    rabbit->add_component<Position>({.x = 400, .y = 200});
-    rabbit->add_component<Gravity>({.g = 2.0});
+    rabbit->add_component<Position>({.x = 100, .y = 200});
+    rabbit->add_component<Gravity>({.g = 0});
+	 rabbit->add_component<Shooting>({.cooldown = 0.0});
+
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
@@ -41,11 +43,11 @@ int main ()
 		BeginDrawing();
 
 		// Setup the back buffer for drawing (clear color and depth buffers)
-		ClearBackground(BLACK);
+		ClearBackground(WHITE);
 
 		// draw some text using the default font
-		DrawText("Hello Raylib", 200,200,20,WHITE);
-
+		DrawText("Hello Raylib", 200,200,20,BLACK);
+		shoot();
 		// draw our texture to the screen
 		//DrawTexture(wabbit, 400, 200, WHITE);
 	    updateGravity(d);	
