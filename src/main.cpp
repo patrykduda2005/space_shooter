@@ -29,7 +29,7 @@ int main ()
 	// Load a texture from the resources directory
 	//Texture wabbit = LoadTexture("wabbit_alpha.png");
     Entity* rabbit = entities->new_entity();
-    rabbit->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
+    rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
     rabbit->add_component<Position>({.x = 500, .y = 700});
     rabbit->add_component<ArrowMovement>({0, 400, 0, 400});
     rabbit->add_component<RestrictToWorld>({});	
@@ -46,7 +46,7 @@ int main ()
 
 		// draw some text using the default font
 		//DrawText("Hello Raylib", 200,200,20,WHITE);
-
+		shoot();
 		// draw our texture to the screen
 		//DrawTexture(wabbit, 400, 200, WHITE);
 	    updateGravity(d);	

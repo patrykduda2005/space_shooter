@@ -33,13 +33,17 @@ void shoot() {
             if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && shootComp->cooldown <= 0) {
                 // Create a new bullet entity
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
+                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y});
-                bullet->add_component<Gravity>({.g = -250.0});
+                bullet->add_component<Gravity>({.g = -500.0});
               //  cout << "Shooting!\n";
-                shootComp->cooldown = 0.5; // half a second cooldown
+                shootComp->cooldown = 0.25; // half a second cooldown
 
             }
+        }
+    }
+}
+
 void arrowMovement(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
