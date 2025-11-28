@@ -26,3 +26,14 @@ void shoot();
 
 
 
+typedef struct {
+    float northSpeed;
+    float eastSpeed;
+    float southSpeed;
+    float westSpeed;
+} ArrowMovement;
+void arrowMovement(float d);
+
+typedef struct {
+} RestrictToWorld;
+void restrictToWorld(float d);
