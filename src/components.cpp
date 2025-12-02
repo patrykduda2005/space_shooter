@@ -37,6 +37,7 @@ void shoot() {
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y});
                 bullet->add_component<Gravity>({.g = -500.0});
+                bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.0; // half a second cooldown
 
@@ -84,7 +85,8 @@ void destroyBeyondWorld() {
             if (pos->x > wb->x + wb->width 
                     || pos->y > wb->y + wb->height
                     || pos->x < wb->x
-                    || pos->y < wb->y);
+                    || pos->y < wb->y)
+                entities->kill_entity(ent);
         }
     }
 }

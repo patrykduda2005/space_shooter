@@ -7,6 +7,7 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 */
 
+#include <iostream>
 #include "raylib.h"
 #include "ecs.h"
 #include "components.h"
@@ -53,6 +54,9 @@ int main ()
         renderThings(d);
         arrowMovement(d);
         restrictToWorld(d);
+        destroyBeyondWorld();
+        std::cout << "Entities: " << entities->get().size() << "\n";
+        std::cout << "FPS: " << GetFPS() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
