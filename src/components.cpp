@@ -1,4 +1,5 @@
 #include "components.h"
+#include "ecs.h"
 #include "resources.h"
 
 void updateGravity(float d) {
@@ -37,7 +38,7 @@ void shoot() {
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y});
                 bullet->add_component<Gravity>({.g = -500.0});
               //  cout << "Shooting!\n";
-                shootComp->cooldown = 0.25; // half a second cooldown
+                shootComp->cooldown = 0.0; // half a second cooldown
 
             }
         }
@@ -62,12 +63,28 @@ void restrictToWorld(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
+        auto restrict = ent->get_component<RestrictToWorld>();
         auto wb = resources->get_component<WorldBorder>();
-        if (wb && pos) {
+        if (wb && pos && restrict) {
             if (pos->x > wb->x + wb->width) pos->x = wb->x + wb->width;
             if (pos->y > wb->y + wb->height) pos->y = wb->x + wb->height;
             if (pos->x < wb->x) pos->x = wb->x;
             if (pos->y < wb->y) pos->y = wb->y;
+        }
+    }
+}
+
+void destroyBeyondWorld() {
+    for (int i = 0; i < entities->get().size(); i++) {
+        auto ent = entities->get()[i];
+        auto pos = ent->get_component<Position>();
+        auto destroy = ent->get_component<DestroyBeyondWorld>();
+        auto wb = resources->get_component<WorldBorder>();
+        if (wb && pos && destroy) {
+            if (pos->x > wb->x + wb->width 
+                    || pos->y > wb->y + wb->height
+                    || pos->x < wb->x
+                    || pos->y < wb->y);
         }
     }
 }

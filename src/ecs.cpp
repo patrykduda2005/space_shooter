@@ -30,3 +30,14 @@ Entity* Entities::new_entity() {
 std::vector<Entity*> Entities::get() {
     return this->ents;
 }
+
+void Entities::kill_entity(Entity* ent) {
+    for (int i = 0; i < this->ents.size(); i++) {
+        if (this->ents[i] == ent) {
+            Entity *last_ent = this->ents[this->ents.size() - 1];
+            this->ents[i] = last_ent;
+            this->ents.pop_back();
+            delete ent;
+        }
+    }
+}

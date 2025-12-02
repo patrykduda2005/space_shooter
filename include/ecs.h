@@ -22,7 +22,7 @@ class _Component {
 
 struct _component_wrapper {
     comp_id_t id;
-    void *comp;
+    void *comp; // pointer to component class
 };
 
 class Entity {
@@ -33,6 +33,8 @@ class Entity {
     void add_component(T comp);
     template<typename T>
     T* get_component();
+    template<typename T>
+    void remove_component();
 };
 
 class Entities {
@@ -41,6 +43,7 @@ class Entities {
     Entities() {};
     Entity* new_entity();
     std::vector<Entity*> get();
+    void kill_entity(Entity* ent);
 };
 
 extern Entities *entities;
@@ -63,4 +66,15 @@ T* Entity::get_component() {
     return NULL;
 }
 
+template<typename T>
+void Entity::remove_component() {
+    comp_id_t comp_id = registry->_get_id(typeid(T).name());
+    for (int i = 0; i < this->components.size(); i++) {
+        if (this->components[i].id == comp_id) {
+            struct _component_wrapper last_comp = this->components[this->components.size() - 1];
+            this->components[i] = last_comp;
+            this->components.pop_back();
+        }
+    }
+}
 

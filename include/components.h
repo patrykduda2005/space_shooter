@@ -22,10 +22,6 @@ typedef struct{
 } Shooting;
 void shoot();
 
-
-
-
-
 typedef struct {
     float northSpeed;
     float eastSpeed;
@@ -37,3 +33,7 @@ void arrowMovement(float d);
 typedef struct {
 } RestrictToWorld;
 void restrictToWorld(float d);
+
+typedef struct {
+} DestroyBeyondWorld;
+void destroyBeyondWorld();

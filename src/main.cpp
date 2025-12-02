@@ -33,7 +33,7 @@ int main ()
     rabbit->add_component<Position>({.x = 500, .y = 700});
     rabbit->add_component<ArrowMovement>({0, 400, 0, 400});
     rabbit->add_component<RestrictToWorld>({});	
-	 rabbit->add_component<Shooting>({.cooldown = 0.0});
+	rabbit->add_component<Shooting>({.cooldown = 0.0});
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
