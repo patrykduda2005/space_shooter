@@ -29,7 +29,7 @@ int main ()
 	SearchAndSetResourceDir("resources");
 
 
-	int type = 0;
+	int type = 1;
 
 	// Load a texture from the resources directory
 	//Texture wabbit = LoadTexture("wabbit_alpha.png");
@@ -51,12 +51,17 @@ int main ()
 
 		// draw some text using the default font
 		//DrawText("Hello Raylib", 200,200,20,WHITE);
-		
-		DrawText(std::to_string(type).c_str(), 100,300,35,BLACK);
+		DrawText("Press 1, 2 or 3 to change shooting type", 50,30,25,BLACK);
+		DrawText(std::to_string(type).c_str(), 50,75,25,BLACK);
 
-		if (IsKeyPressed(KEY_TAB)){ 
-			type++;
-			if (type > 1) type = 0;
+		if (IsKeyPressed(KEY_ONE)){ 
+			type = 1;
+		}
+		if (IsKeyPressed(KEY_TWO)){ 
+			type = 2;
+		}
+		if (IsKeyPressed(KEY_THREE)){ 
+			type = 3;
 		}
 		//std::cout<<type<<"\n";
 		

@@ -45,18 +45,18 @@ void shoot(int tab) {
         auto vel = ent->get_component<Velocity>();
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
-            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 &&tab == 0) {
+            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 &&tab == 1) {
                 // Create a new bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Position>({.x = pos->x + 10, .y = pos->y});
-                bullet->add_component<Gravity>({.g = -500.0});
+                bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 1) {
+            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
@@ -81,7 +81,27 @@ void shoot(int tab) {
                 bullet3->add_component<DestroyBeyondWorld>({});
                 
 
-                shootComp->cooldown = 0.5; // half a second cooldown
+                shootComp->cooldown = 0.25; // half a second cooldown
+
+            }
+            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 3) {
+                // Create a first bullet entity
+                Entity* bullet = entities->new_entity();
+                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet->add_component<Velocity>({.x = -100});
+                bullet->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet->add_component<Gravity>({.g = -600.0});
+                bullet->add_component<DestroyBeyondWorld>({});
+              
+                // Create a second bullet entity
+                Entity* bullet2 = entities->new_entity();
+                bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet2->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet2->add_component<Velocity>({.x = 100});
+                bullet2->add_component<Gravity>({.g = -600.0});
+                bullet2->add_component<DestroyBeyondWorld>({});
+             
+                shootComp->cooldown = 0.25; // half a second cooldown
 
             }
         }
