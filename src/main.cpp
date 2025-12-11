@@ -16,6 +16,7 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 int main ()
 {
+	SetTargetFPS(144);
     initResources();
 	// Tell the window to use vsync and work on high DPI displays
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
@@ -26,6 +27,9 @@ int main ()
 
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
+
+
+	int type = 0;
 
 	// Load a texture from the resources directory
 	//Texture wabbit = LoadTexture("wabbit_alpha.png");
@@ -47,16 +51,26 @@ int main ()
 
 		// draw some text using the default font
 		//DrawText("Hello Raylib", 200,200,20,WHITE);
-		shoot();
-		// draw our texture to the screen
-		//DrawTexture(wabbit, 400, 200, WHITE);
-	    updateGravity(d);	
+		
+		DrawText(std::to_string(type).c_str(), 100,300,35,BLACK);
+
+		if (IsKeyPressed(KEY_TAB)){ 
+			type++;
+			if (type > 1) type = 0;
+		}
+		//std::cout<<type<<"\n";
+		
+		shoot(type);
+
+		
+	    updateGravity(d);
+		 updateVelocity(d);
         renderThings(d);
         arrowMovement(d);
         restrictToWorld(d);
         destroyBeyondWorld();
         std::cout << "Entities: " << entities->get().size() << "\n";
-        std::cout << "FPS: " << GetFPS() << "\n";
+        //std::cout << "FPS: " << GetFPS() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}

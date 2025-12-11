@@ -20,7 +20,13 @@ void renderThings(float d);
 typedef struct{
     float cooldown;
 } Shooting;
-void shoot();
+void shoot(int tab);
+
+typedef struct{
+    float x;
+    float y;
+} Velocity;
+void updateVelocity(float d);
 
 typedef struct {
     float northSpeed;
