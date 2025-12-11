@@ -35,11 +35,11 @@ void shoot() {
                 // Create a new bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y});
+                bullet->add_component<Position>({.x = pos->x + 10, .y = pos->y});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
-                shootComp->cooldown = 0.0; // half a second cooldown
+                shootComp->cooldown = 0.25; // half a second cooldown
 
             }
         }
