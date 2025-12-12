@@ -32,7 +32,7 @@ void renderThings(float d) {
         auto ren = ent->get_component<Render>();
         auto pos = ent->get_component<Position>();
         if (ren && pos) {
-            DrawTexture(ren->txt, pos->x, pos->y, WHITE);
+            DrawTexture(ren->txt, pos->x - ren->txt.width/2, pos->y - ren->txt.height/2, WHITE);
         }
     }
 }
@@ -49,25 +49,25 @@ void shoot(int tab) {
                 // Create a new bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
                 bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet2->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 150});
                 bullet2->add_component<Gravity>({.g = -500.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
@@ -75,7 +75,7 @@ void shoot(int tab) {
                 // Create a third bullet entity
                 Entity* bullet3 = entities->new_entity();
                 bullet3->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet3->add_component<Position>({.x = pos->x +10, .y = pos->y});
+                bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet3->add_component<Velocity>({.x = -150});
                 bullet3->add_component<Gravity>({.g = -500.0});
                 bullet3->add_component<DestroyBeyondWorld>({});
@@ -84,19 +84,19 @@ void shoot(int tab) {
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Velocity>({.x = -100});
-                bullet->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -600.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
                 bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet2->add_component<Position>({.x = pos->x + 10, .y = pos->y});
+                bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 100});
                 bullet2->add_component<Gravity>({.g = -600.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
@@ -130,7 +130,7 @@ void restrictToWorld(float d) {
         auto wb = resources->get_component<WorldBorder>();
         if (wb && pos && restrict) {
             if (pos->x > wb->x + wb->width) pos->x = wb->x + wb->width;
-            if (pos->y > wb->y + wb->height) pos->y = wb->x + wb->height;
+            if (pos->y > wb->y + wb->height) pos->y = wb->y + wb->height;
             if (pos->x < wb->x) pos->x = wb->x;
             if (pos->y < wb->y) pos->y = wb->y;
         }

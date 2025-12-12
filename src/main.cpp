@@ -36,7 +36,7 @@ int main ()
     Entity* rabbit = entities->new_entity();
     rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
     rabbit->add_component<Position>({.x = 500, .y = 700});
-    rabbit->add_component<ArrowMovement>({0, 400, 0, 400});
+    rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
     rabbit->add_component<RestrictToWorld>({});	
 	rabbit->add_component<Shooting>({.cooldown = 0.0});
 	// game loop
