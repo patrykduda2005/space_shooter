@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 enum CONTAINS {
     CONTAINS = 0,
     OUTSIDE_UP,
@@ -22,7 +23,11 @@ class Area {
     Vec2 left_up_corner;
     Vec2 right_down_corner;
     Area(Vec2 left_up_corner, Vec2 right_down_corner);
+    Area operator+(Vec2 new_reference_point);
+    friend std::ostream& operator<<(std::ostream& os, Area a);
     Vec2 get_middle();
+    float getWidth();
+    float getHeight();
     enum CONTAINS contains(Vec2 v);
     bool overlaps(Area a);
 };

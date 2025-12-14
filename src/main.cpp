@@ -35,6 +35,11 @@ int main ()
     rabbit->add_component<ArrowMovement>({0, 400, 0, 400});
     rabbit->add_component<RestrictToWorld>({});	
 	rabbit->add_component<Shooting>({.cooldown = 0.0});
+
+    Entity* enemy = entities->new_entity();
+    enemy->add_component<Position>({.x = 500, .y = 100});
+    enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+    enemy->add_component<Collider>({.layer = 1, .collisionBox = Area(Vec2(0,0), Vec2(100,100)), .events = Event::Die});
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
@@ -55,6 +60,8 @@ int main ()
         arrowMovement(d);
         restrictToWorld(d);
         destroyBeyondWorld();
+        detectCollision();
+        outlineColliders();
         std::cout << "Entities: " << entities->get().size() << "\n";
         std::cout << "FPS: " << GetFPS() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)

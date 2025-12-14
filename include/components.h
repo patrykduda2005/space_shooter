@@ -2,6 +2,7 @@
 
 #include "ecs.h"
 #include "raylib.h"
+#include "utils.h"
 typedef struct {
     float g;
 } Gravity;
@@ -38,11 +39,15 @@ typedef struct {
 } DestroyBeyondWorld;
 void destroyBeyondWorld();
 
+enum Event {
+    Die = (1 << 31),
+    Kill = (1 << 30),
+};
+
 typedef struct {
     int layer;
-    float x;
-    float y;
-    float width;
-    float height;
+    Area collisionBox; // Cordinates are RELATIVE to entity owning that collisionBox, NOT absolute.
+    int events;
 } Collider;
 void detectCollision();
+void outlineColliders();

@@ -21,15 +21,34 @@ Area::Area(Vec2 left_up_corner, Vec2 right_down_corner) {
     this->left_up_corner = left_up_corner;
     this->right_down_corner = right_down_corner;
 }
+Area Area::operator+(Vec2 new_reference_point) {
+    Area copy = Area(this->left_up_corner, this->right_down_corner);
+    copy.left_up_corner = copy.left_up_corner + new_reference_point;
+    copy.right_down_corner = copy.right_down_corner + new_reference_point;
+    return copy;
+}
+
+// Bazujac na: https://www.youtube.com/watch?v=TwW2Nl45FvE
+std::ostream& operator<<(std::ostream& os, Area a) {
+    os << "Area: (" << a.left_up_corner.x << ", " << a.left_up_corner.y << "), ("
+        << a.right_down_corner.x << ", " << a.right_down_corner.y << ")";
+    return os;
+}
 
 Vec2 Area::get_middle() {
-    Vec2 width_and_height = this->right_down_corner - this->left_up_corner;
-    float width = width_and_height.x;
-    float height = width_and_height.y;
+    float width = this->getWidth();
+    float height = this->getHeight();
     return Vec2(
             this->right_down_corner.x - (width/2),
             this->right_down_corner.y - (height/2)
             );
+}
+
+float Area::getWidth() {
+    return this->right_down_corner.x - this->left_up_corner.x;
+}
+float Area::getHeight() {
+    return this->right_down_corner.y - this->left_up_corner.y;
 }
 
 enum CONTAINS Area::contains(Vec2 v) {
@@ -45,8 +64,8 @@ bool Area::overlaps(Area a) {
     if (this->left_up_corner.x > a.right_down_corner.x ||
             a.left_up_corner.x > this->right_down_corner.x)
         return false;
-    if (this->right_down_corner.y > a.left_up_corner.y ||
-            a.right_down_corner.y > this->left_up_corner.y)
+    if (this->right_down_corner.y < a.left_up_corner.y ||
+            a.right_down_corner.y < this->left_up_corner.y)
         return false;
     return true;
 }
