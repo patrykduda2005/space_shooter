@@ -1,6 +1,7 @@
 #include "components.h"
 #include "ecs.h"
 #include "resources.h"
+#include <iostream>
 
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
@@ -39,7 +40,7 @@ void shoot() {
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
-                shootComp->cooldown = 0.0; // half a second cooldown
+                shootComp->cooldown = 0.25; // half a second cooldown
 
             }
         }
@@ -87,6 +88,23 @@ void destroyBeyondWorld() {
                     || pos->x < wb->x
                     || pos->y < wb->y)
                 entities->kill_entity(ent);
+        }
+    }
+}
+
+void detectCollision() {
+    for (Entity *ent : entities->get()) {
+        auto col = ent->get_component<Collider>();
+        if (!col) continue;
+        auto pos = ent->get_component<Position>();
+        if (!pos) continue;
+
+        for (Entity *ent_2 : entities->get()) {
+            auto ent_2_col = ent_2->get_component<Collider>();
+            if (ent_2_col == NULL) continue;
+            auto ent_2_pos = ent_2->get_component<Position>();
+            if (ent_2_pos == NULL) continue;
+            if (ent_2_col->layer != col->layer) continue;
         }
     }
 }

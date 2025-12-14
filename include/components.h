@@ -37,3 +37,12 @@ void restrictToWorld(float d);
 typedef struct {
 } DestroyBeyondWorld;
 void destroyBeyondWorld();
+
+typedef struct {
+    int layer;
+    float x;
+    float y;
+    float width;
+    float height;
+} Collider;
+void detectCollision();
