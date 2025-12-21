@@ -96,6 +96,8 @@ int main ()
 	//UnloadTexture(wabbit);
 
 	// destroy the window and cleanup the OpenGL context
+	UnloadSound(shootingsfx); // Usuwamy dźwięk z pamięci
+	CloseAudioDevice();
 	CloseWindow();
 	return 0;
 }
