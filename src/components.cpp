@@ -37,7 +37,7 @@ void renderThings(float d) {
     }
 }
 
-void shoot(int tab, int ammoCount[]) {
+void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
@@ -53,10 +53,11 @@ void shoot(int tab, int ammoCount[]) {
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
+                PlaySound(shootingsfx);
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoCount[2] >= 3 && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (KEY_SPACE) && ammoPointer[2] >= 3 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
@@ -80,11 +81,11 @@ void shoot(int tab, int ammoCount[]) {
                 bullet3->add_component<Gravity>({.g = -500.0});
                 bullet3->add_component<DestroyBeyondWorld>({});
                 
-                if (ammoCount[2] >= 3) ammoCount[2] -= 3;
+                if (ammoPointer[2] >= 3) ammoPointer[2] -= 3;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoCount[1] >= 2 && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (KEY_SPACE) && ammoPointer[1] >= 2 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
@@ -101,7 +102,7 @@ void shoot(int tab, int ammoCount[]) {
                 bullet2->add_component<Gravity>({.g = -600.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
              
-                if(ammoCount[1] >= 2) ammoCount[1] -= 2;
+                if(ammoPointer[1] >= 2) ammoPointer[1] -= 2;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }

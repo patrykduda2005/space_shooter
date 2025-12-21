@@ -23,14 +23,16 @@ int main ()
 
 	// Create the window and OpenGL context
     auto worldBorder = resources->get_component<WorldBorder>();
-	InitWindow(worldBorder->width, worldBorder->height, "Hello Raylib");
-
+	InitWindow(worldBorder->width, worldBorder->height, "AGH TALES: RISE OF THE WIELKI PIEC");
+	InitAudioDevice();				  // Initialize audio device
 	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
 	SearchAndSetResourceDir("resources");
 
+	Sound shootingsfx = LoadSound("shoot.wav");
 
 	int type = 1;
 	int ammoCount[3] = {0,21,31};
+	int *ammoPointer = &ammoCount[0];
 
 	//WIELKI PIEC
     Entity* rabbit = entities->new_entity();
@@ -58,8 +60,7 @@ int main ()
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(WHITE);
 
-		// draw some text using the default font
-		//DrawText("Hello Raylib", 200,200,20,WHITE);
+		
 		DrawText("Press 1, 2 or 3 to change shooting type", 50,30,25,BLACK);
 		DrawText(std::to_string(type).c_str(), 50,75,25,BLACK);
 		
@@ -77,7 +78,7 @@ int main ()
 		if(type == 3) DrawText(std::to_string(ammoCount[2]).c_str(), 825,700,25,BLACK);
 		
 
-		shoot(type, ammoCount);
+		shoot(type, ammoPointer, shootingsfx);
 	    updateGravity(d);
 		 updateVelocity(d);
         renderThings(d);
