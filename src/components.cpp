@@ -47,18 +47,21 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
             if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 &&tab == 1) {
                 // Create a new bullet entity
+                PlaySound(shootingsfx);
+
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               //  cout << "Shooting!\n";
-                PlaySound(shootingsfx);
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
             else if (IsKeyDown (KEY_SPACE) && ammoPointer[2] >= 3 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
+                PlaySound(shootingsfx);
+
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
@@ -87,6 +90,8 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
             }
             else if (IsKeyDown (KEY_SPACE) && ammoPointer[1] >= 2 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
+                PlaySound(shootingsfx);
+                
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
                 bullet->add_component<Velocity>({.x = -100});
