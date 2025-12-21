@@ -30,16 +30,25 @@ int main ()
 
 
 	int type = 1;
+	int ammoCount[3] = {0,21,31};
 
-	// Load a texture from the resources directory
-	//Texture wabbit = LoadTexture("wabbit_alpha.png");
+	//WIELKI PIEC
     Entity* rabbit = entities->new_entity();
     rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
     rabbit->add_component<Position>({.x = 500, .y = 700});
     rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
     rabbit->add_component<RestrictToWorld>({});	
 	rabbit->add_component<Shooting>({.cooldown = 0.0});
-	// game loop
+	
+
+	// ammunicja
+		Entity* ammo = entities->new_entity();
+		ammo->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
+		ammo->add_component<Position>({.x = 500, .y = 100});
+		ammo->add_component<Gravity>({.g = 0.0});
+		ammo->add_component<DestroyBeyondWorld>({});
+
+
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
         float d = GetFrameTime();
@@ -53,21 +62,22 @@ int main ()
 		//DrawText("Hello Raylib", 200,200,20,WHITE);
 		DrawText("Press 1, 2 or 3 to change shooting type", 50,30,25,BLACK);
 		DrawText(std::to_string(type).c_str(), 50,75,25,BLACK);
-
-		if (IsKeyPressed(KEY_ONE)){ 
-			type = 1;
-		}
-		if (IsKeyPressed(KEY_TWO)){ 
-			type = 2;
-		}
-		if (IsKeyPressed(KEY_THREE)){ 
-			type = 3;
-		}
-		//std::cout<<type<<"\n";
 		
-		shoot(type);
 
+		if (IsKeyPressed(KEY_ONE)) type = 1;
+		if (IsKeyPressed(KEY_TWO)) type = 2;
+		if (IsKeyPressed(KEY_THREE)) type = 3;
 		
+		DrawText("Ammo:", 750,700,25,BLACK);
+		if(type == 1){
+			DrawText("o", 825,700,25,BLACK);
+			DrawText("o", 835,700,25,BLACK);
+		}
+		if(type == 2) DrawText(std::to_string(ammoCount[1]).c_str(), 825,700,25,BLACK);
+		if(type == 3) DrawText(std::to_string(ammoCount[2]).c_str(), 825,700,25,BLACK);
+		
+
+		shoot(type, ammoCount);
 	    updateGravity(d);
 		 updateVelocity(d);
         renderThings(d);
