@@ -43,3 +43,7 @@ void restrictToWorld(float d);
 typedef struct {
 } DestroyBeyondWorld;
 void destroyBeyondWorld();
+
+typedef struct {
+} AmmoCounter;
+void ammoCounter(int type, int *ammoPointer);

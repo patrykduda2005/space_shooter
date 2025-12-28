@@ -60,7 +60,7 @@ int main ()
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(WHITE);
 
-		
+		DrawText("Ammo", 875,650,25,BLACK);
 		DrawText("Press 1, 2 or 3 to change shooting type", 50,30,25,BLACK);
 		//DrawText(std::to_string(type).c_str(), 50,75,25,BLACK);
 
@@ -68,42 +68,19 @@ int main ()
 		if (IsKeyPressed(KEY_TWO)) type = 2;
 		if (IsKeyPressed(KEY_THREE)) type = 3;
 		
-		DrawText("Ammo", 875,650,25,BLACK);
-		if(type == 1){
-			DrawText("o", 875,675,35,BLACK);
-			DrawText("o", 885,675,35,BLACK);
-			DrawText("1x", 920,675,35,BLACK);
-			DrawText(std::to_string(ammoCount[1]).c_str(), 875,705,25,BLACK);
-			DrawText(std::to_string(ammoCount[2]).c_str(), 875,730,25,BLACK);
-		}
-		else if(type == 2){ 
-			DrawText("o", 875,675,25,BLACK);
-			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoCount[1]).c_str(), 875,700,35,BLACK);
-			DrawText("2x", 920,700,35,BLACK);
-			DrawText(std::to_string(ammoCount[2]).c_str(), 875,730,25,BLACK);
-		}
-		else if(type == 3){ 
-			DrawText("o", 875,675,25,BLACK);
-			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoCount[1]).c_str(), 875,700,25,BLACK);
-			DrawText(std::to_string(ammoCount[2]).c_str(), 875,730,35,BLACK);
-			DrawText("3x", 920,730,35,BLACK);
-		}
 		
-		/*
 		DrawText("FPS:", 50,700,25,BLACK);
-		DrawText(std::to_string(GetFPS()).c_str(), 120,700,25,BLACK); */
+		DrawText(std::to_string(GetFPS()).c_str(), 120,700,25,BLACK); 
 
 		shoot(type, ammoPointer, shootingsfx);
-	    updateGravity(d);
-		 updateVelocity(d);
-        renderThings(d);
-        arrowMovement(d);
-        restrictToWorld(d);
-        destroyBeyondWorld();
+	   updateGravity(d);
+		updateVelocity(d);
+      renderThings(d);
+      arrowMovement(d);
+      restrictToWorld(d);
+      destroyBeyondWorld();
+		ammoCounter(type, ammoPointer);
         //std::cout << "Entities: " << entities->get().size() << "\n";
-        //std::cout << "FPS: " << GetFPS() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}

@@ -2,6 +2,7 @@
 #include "ecs.h"
 #include "resources.h"
 #include <cmath>
+#include <string>
 
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
@@ -158,4 +159,29 @@ void destroyBeyondWorld() {
                 entities->kill_entity(ent);
         }
     }
+}
+
+void ammoCounter(int type, int *ammoPointer){
+    if(type == 1){
+			DrawText("o", 875,675,35,BLACK);
+			DrawText("o", 885,675,35,BLACK);
+			DrawText("1x", 920,675,35,BLACK);
+			DrawText(std::to_string(ammoPointer[1]).c_str(), 875,705,25,BLACK);
+			DrawText(std::to_string(ammoPointer[2]).c_str(), 875,730,25,BLACK);
+		}
+		else if(type == 2){ 
+			DrawText("o", 875,675,25,BLACK);
+			DrawText("o", 885,675,25,BLACK);
+			DrawText(std::to_string(ammoPointer[1]).c_str(), 875,700,35,BLACK);
+			DrawText("2x", 920,700,35,BLACK);
+			DrawText(std::to_string(ammoPointer[2]).c_str(), 875,730,25,BLACK);
+		}
+		else if(type == 3){ 
+			DrawText("o", 875,675,25,BLACK);
+			DrawText("o", 885,675,25,BLACK);
+			DrawText(std::to_string(ammoPointer[1]).c_str(), 875,700,25,BLACK);
+			DrawText(std::to_string(ammoPointer[2]).c_str(), 875,730,35,BLACK);
+			DrawText("3x", 920,730,35,BLACK);
+		}
+
 }
