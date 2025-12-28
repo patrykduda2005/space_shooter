@@ -29,6 +29,7 @@ int main ()
 	SearchAndSetResourceDir("resources");
 
 	Sound shootingsfx = LoadSound("shoot.wav");
+	Texture2D surowka = LoadTexture("surowka.png");
 
 	int type = 1;
 	int ammoCount[3] = {0,21,31};
@@ -72,7 +73,11 @@ int main ()
 		DrawText("FPS:", 50,700,25,BLACK);
 		DrawText(std::to_string(GetFPS()).c_str(), 120,700,25,BLACK); 
 
-		shoot(type, ammoPointer, shootingsfx);
+		// if(IsKeyDown(KEY_SPACE)) {
+		// 	PlaySound(shootingsfx);
+		// }
+
+		shoot(type, ammoPointer, shootingsfx, surowka);
 	   updateGravity(d);
 		updateVelocity(d);
       renderThings(d);
@@ -91,6 +96,7 @@ int main ()
 
 	// destroy the window and cleanup the OpenGL context
 	UnloadSound(shootingsfx); // Usuwamy dźwięk z pamięci
+	UnloadTexture(surowka);
 	CloseAudioDevice();
 	CloseWindow();
 	return 0;

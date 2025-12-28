@@ -20,7 +20,7 @@ void renderThings(float d);
 typedef struct{
     float cooldown;
 } Shooting;
-void shoot(int tab, int *ammoPointer, Sound shootingsfx);
+void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture);
 
 typedef struct{
     float x;

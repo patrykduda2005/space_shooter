@@ -38,7 +38,7 @@ void renderThings(float d) {
     }
 }
 
-void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
+void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
@@ -51,7 +51,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
                 PlaySound(shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet->add_component<Render>({.txt = bulletTexture});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
@@ -64,14 +64,14 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
                 PlaySound(shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet->add_component<Render>({.txt = bulletTexture});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet2->add_component<Render>({.txt = bulletTexture});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 150});
                 bullet2->add_component<Gravity>({.g = -500.0});
@@ -79,7 +79,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
                 
                 // Create a third bullet entity
                 Entity* bullet3 = entities->new_entity();
-                bullet3->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet3->add_component<Render>({.txt = bulletTexture});
                 bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet3->add_component<Velocity>({.x = -150});
                 bullet3->add_component<Gravity>({.g = -500.0});
@@ -94,7 +94,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
                 PlaySound(shootingsfx);
                 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet->add_component<Render>({.txt = bulletTexture});
                 bullet->add_component<Velocity>({.x = -100});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -600.0});
@@ -102,7 +102,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx) {
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
+                bullet2->add_component<Render>({.txt = bulletTexture});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 100});
                 bullet2->add_component<Gravity>({.g = -600.0});
