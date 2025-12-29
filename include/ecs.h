@@ -20,19 +20,21 @@ class _Component {
     _Component(T component): comp(component) {};
 };
 
-struct _component_wrapper {
+struct _component_handle {
     comp_id_t id;
     void *comp; // pointer to component class
 };
 
 class Entity {
-    std::vector<struct _component_wrapper> components;
+    std::vector<struct _component_handle> components;
     public:
     Entity() {};
     template<typename T>
     void add_component(T comp);
     template<typename T>
     T* get_component();
+    template<typename T>
+    std::vector<T*> get_components();
     template<typename T>
     void remove_component();
 };
@@ -67,11 +69,24 @@ T* Entity::get_component() {
 }
 
 template<typename T>
+std::vector<T*> Entity::get_components() {
+    auto collected_components = std::vector<T*>();
+    comp_id_t comp_id = registry->_get_id(typeid(T).name());
+    for (int i = 0; i < this->components.size(); i++) {
+        if (this->components[i].id == comp_id) 
+            collected_components.push_back(
+                    (T*)this->components[i].comp
+                    );
+    }
+    return collected_components;
+}
+
+template<typename T>
 void Entity::remove_component() {
     comp_id_t comp_id = registry->_get_id(typeid(T).name());
     for (int i = 0; i < this->components.size(); i++) {
         if (this->components[i].id == comp_id) {
-            struct _component_wrapper last_comp = this->components[this->components.size() - 1];
+            struct _component_handle last_comp = this->components[this->components.size() - 1];
             this->components[i] = last_comp;
             this->components.pop_back();
         }
