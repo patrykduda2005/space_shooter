@@ -1,5 +1,6 @@
 #pragma once
 #include "ecs.h"
+#include "raylib.h"
 
 typedef struct {
     float x;
@@ -9,5 +10,17 @@ typedef struct {
 } WorldBorder;
 
 void initResources();
+
+typedef struct {
+    Sound shootingsfx;
+} SoundResources;
+void initSoundResources();
+
+typedef struct {
+    Texture2D bull;
+}BulletTexture;
+void initBulletTexture();
+
+void unLoadResources();
 
 extern Entity *resources;

@@ -4,6 +4,7 @@
 #include "resources.h"
 #include <cmath>
 #include <string>
+#include <iostream>
 
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
@@ -39,12 +40,15 @@ void renderThings(float d) {
     }
 }
 
-void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture) {
+void shoot(int tab, int *ammoPointer) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
         auto shootComp = ent->get_component<Shooting>();
         auto vel = ent->get_component<Velocity>();
+        auto bulltxt = resources->get_component<BulletTexture>();
+        auto sound = resources->get_component<SoundResources>();
+
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
             if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 &&tab == 1) {
@@ -52,7 +56,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
                 PlaySound(shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulletTexture});
+                bullet->add_component<Render>({.txt = bulltxt->bull});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
@@ -62,7 +66,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
                         .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
                         .applies = {create_component<Gravity>({.g = 100})}
                         });
-              //  cout << "Shooting!\n";
+                std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
@@ -71,14 +75,14 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
                 PlaySound(shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulletTexture});
+                bullet->add_component<Render>({.txt = bulltxt->bull});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = bulletTexture});
+                bullet2->add_component<Render>({.txt = bulltxt->bull});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 150});
                 bullet2->add_component<Gravity>({.g = -500.0});
@@ -86,7 +90,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
                 
                 // Create a third bullet entity
                 Entity* bullet3 = entities->new_entity();
-                bullet3->add_component<Render>({.txt = bulletTexture});
+                bullet3->add_component<Render>({.txt = bulltxt->bull});
                 bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet3->add_component<Velocity>({.x = -150});
                 bullet3->add_component<Gravity>({.g = -500.0});
@@ -101,7 +105,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
                 PlaySound(shootingsfx);
                 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulletTexture});
+                bullet->add_component<Render>({.txt = bulltxt->bull});
                 bullet->add_component<Velocity>({.x = -100});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -600.0});
@@ -109,7 +113,7 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = bulletTexture});
+                bullet2->add_component<Render>({.txt = bulltxt->bull});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 100});
                 bullet2->add_component<Gravity>({.g = -600.0});

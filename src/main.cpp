@@ -14,6 +14,7 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "resources.h"
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
+
 int main ()
 {
 	SetTargetFPS(144);
@@ -25,11 +26,10 @@ int main ()
     auto worldBorder = resources->get_component<WorldBorder>();
 	InitWindow(worldBorder->width, worldBorder->height, "AGH TALES: RISE OF THE WIELKI PIEC");
 	InitAudioDevice();				  // Initialize audio device
-	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
+	initResources();
+	initSoundResources();
+	initBulletTexture();
 	SearchAndSetResourceDir("resources");
-
-	Sound shootingsfx = LoadSound("shoot.wav");
-	Texture2D surowka = LoadTexture("surowka.png");
 
 	int type = 1;
 	int ammoCount[3] = {0,21,31};
@@ -49,14 +49,6 @@ int main ()
     enemy->add_component<Hitbox>({.layer = HitboxLayer::Enemies, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
 	// game loop
 	
-/*
-	// ammunicja
-		Entity* ammo = entities->new_entity();
-		ammo->add_component<Render>({.txt = LoadTexture("wabbit_alpha.png")});
-		ammo->add_component<Position>({.x = 500, .y = 100});
-		ammo->add_component<Gravity>({.g = 0.0});
-		ammo->add_component<DestroyBeyondWorld>({});
-*/
 
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
@@ -83,15 +75,15 @@ int main ()
 		// 	PlaySound(shootingsfx);
 		// }
 
-		shoot(type, ammoPointer, shootingsfx, surowka);
+		shoot(type, ammoPointer);
 	   updateGravity(d);
 		updateVelocity(d);
       renderThings(d);
       arrowMovement(d);
       restrictToWorld(d);
       destroyBeyondWorld();
-    detectCollision();
-        outlineColliders();
+    	detectCollision();
+      outlineColliders();
 		ammoCounter(type, ammoPointer);
         //std::cout << "Entities: " << entities->get().size() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
@@ -103,8 +95,8 @@ int main ()
 	//UnloadTexture(wabbit);
 
 	// destroy the window and cleanup the OpenGL context
-	UnloadSound(shootingsfx); // Usuwamy dźwięk z pamięci
-	UnloadTexture(surowka);
+		
+	unLoadResources();
 	CloseAudioDevice();
 	CloseWindow();
 	return 0;
