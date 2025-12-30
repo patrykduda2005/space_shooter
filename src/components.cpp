@@ -40,7 +40,7 @@ void shoot() {
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
-                bullet->add_component<Collider>({.layer = 1, .collisionBox = Area(Vec2(0,0), Vec2(100,200))});
+                bullet->add_component<Hitbox>({.layer = HitboxLayer::Bullets, .interactsWith = HitboxLayer::Enemies, .collisionBox = Area(Vec2(0,0), Vec2(100,200))});
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
@@ -99,11 +99,11 @@ void dispatchColision(int events) {
 
 void detectCollision() {
     for (Entity *ent : entities->get()) {
-        auto col = ent->get_component<Collider>();
+        auto col = ent->get_component<Hitbox>();
         auto pos = ent->get_component<Position>();
         if (!pos || !col) continue;
         for (Entity *ent_2 : entities->get()) {
-            auto ent_2_col = ent_2->get_component<Collider>();
+            auto ent_2_col = ent_2->get_component<Hitbox>();
             auto ent_2_pos = ent_2->get_component<Position>();
             if (!ent_2_col || !ent_2_pos) continue;
             if (ent_2 == ent) continue;
@@ -111,17 +111,16 @@ void detectCollision() {
             // Jako ze collisionBox jest relatywny do swojego entity to zamieniam na kordynaty absolutne
             Area global_col = col->collisionBox + Vec2(pos->x, pos->y);
             Area global_col_2 = ent_2_col->collisionBox + Vec2(ent_2_pos->x, ent_2_pos->y);
-            if (ent_2_col->layer != col->layer) continue; // Jak jest na innym layerze to sie nie kolliduje
+            if ((ent_2_col->layer & col->interactsWith) == 0) continue; // Jak jest na innym layerze to sie nie kolliduje
             if (!global_col.overlaps(global_col_2)) continue; // Jak nie koliduje to nie koliduje
             std::cout << "Elo kolizja" << "\n";
-            dispatchColision(col->events);
         }
     }
 }
 
 void outlineColliders() {
     for (Entity *ent : entities->get()) {
-        auto col = ent->get_component<Collider>();
+        auto col = ent->get_component<Hitbox>();
         auto pos = ent->get_component<Position>();
         if (!pos || !col) continue;
         Area global_col = col->collisionBox + Vec2(pos->x, pos->y);

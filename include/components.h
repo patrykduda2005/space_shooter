@@ -3,6 +3,8 @@
 #include "ecs.h"
 #include "raylib.h"
 #include "utils.h"
+#include <cstdint>
+
 typedef struct {
     float g;
 } Gravity;
@@ -39,15 +41,17 @@ typedef struct {
 } DestroyBeyondWorld;
 void destroyBeyondWorld();
 
-enum Event {
-    Die = (1 << 31),
-    Kill = (1 << 30),
+enum HitboxLayer {
+    Nothing = 0,
+    Players = (1 << 31),
+    Bullets = (1 << 30),
+    Enemies = (1 << 29),
 };
 
 typedef struct {
-    int layer;
+    std::int32_t layer;
+    std::int32_t interactsWith;
     Area collisionBox; // Cordinates are RELATIVE to entity owning that collisionBox, NOT absolute.
-    int events;
-} Collider;
+} Hitbox;
 void detectCollision();
 void outlineColliders();

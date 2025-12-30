@@ -39,7 +39,7 @@ int main ()
     Entity* enemy = entities->new_entity();
     enemy->add_component<Position>({.x = 500, .y = 100});
     enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    enemy->add_component<Collider>({.layer = 1, .collisionBox = Area(Vec2(0,0), Vec2(100,100)), .events = Event::Die});
+    enemy->add_component<Hitbox>({.layer = HitboxLayer::Enemies, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
