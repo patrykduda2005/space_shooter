@@ -24,16 +24,16 @@ int main ()
 
 	// Create the window and OpenGL context
     auto worldBorder = resources->get_component<WorldBorder>();
-	InitWindow(worldBorder->width, worldBorder->height, "AGH TALES: RISE OF THE WIELKI PIEC");
+	InitWindow(worldBorder->width, worldBorder->height, "RISE OF THE WIELKI PIEC");
 	InitAudioDevice();				  // Initialize audio device
 	initResources();
 	initSoundResources();
 	initBulletTexture();
+	initAmmoCounter();
+
 	SearchAndSetResourceDir("resources");
 
 	int type = 1;
-	int ammoCount[3] = {0,21,31};
-	int *ammoPointer = &ammoCount[0];
 
 	//WIELKI PIEC
     Entity* rabbit = entities->new_entity();
@@ -71,11 +71,7 @@ int main ()
 		DrawText("FPS:", 50,700,25,BLACK);
 		DrawText(std::to_string(GetFPS()).c_str(), 120,700,25,BLACK); 
 
-		// if(IsKeyDown(KEY_SPACE)) {
-		// 	PlaySound(shootingsfx);
-		// }
-
-		shoot(type, ammoPointer);
+		shoot(type);
 	   updateGravity(d);
 		updateVelocity(d);
       renderThings(d);
@@ -84,7 +80,8 @@ int main ()
       destroyBeyondWorld();
     	detectCollision();
       outlineColliders();
-		ammoCounter(type, ammoPointer);
+		ammoCounter(type);
+
         //std::cout << "Entities: " << entities->get().size() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();

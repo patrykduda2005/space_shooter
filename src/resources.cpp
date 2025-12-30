@@ -34,3 +34,12 @@ void unLoadResources(){
     }
 }
 
+void initAmmoCounter(){
+    resources->add_component<AmmoCounter>({
+        .maxAmmo = {0, 15, 15},
+        .currentAmmo = {0, 15, 15},
+    });
+}
+
+
+

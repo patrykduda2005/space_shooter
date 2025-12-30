@@ -23,7 +23,7 @@ void renderThings(float d);
 typedef struct{
     float cooldown;
 } Shooting;
-void shoot(int tab, int *ammoPointer);
+void shoot(int tab);//, int *ammoPointer);
 
 typedef struct{
     float x;
@@ -62,6 +62,6 @@ typedef struct {
 } Hitbox;
 void detectCollision();
 void outlineColliders();
-typedef struct {
-} AmmoCounter;
-void ammoCounter(int type, int *ammoPointer);
+
+
+void ammoCounter(int type); //, int *ammoPointer);

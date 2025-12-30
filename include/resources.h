@@ -23,4 +23,10 @@ void initBulletTexture();
 
 void unLoadResources();
 
+typedef struct {
+    int maxAmmo[3];
+    int currentAmmo[3];
+} AmmoCounter;
+void initAmmoCounter();
+
 extern Entity *resources;

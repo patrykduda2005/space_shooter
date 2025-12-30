@@ -40,7 +40,7 @@ void renderThings(float d) {
     }
 }
 
-void shoot(int tab, int *ammoPointer) {
+void shoot(int tab){//, int *ammoPointer) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
@@ -48,12 +48,13 @@ void shoot(int tab, int *ammoPointer) {
         auto vel = ent->get_component<Velocity>();
         auto bulltxt = resources->get_component<BulletTexture>();
         auto sound = resources->get_component<SoundResources>();
+        auto ammoComp = resources->get_component<AmmoCounter>();
 
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
-            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 &&tab == 1) {
+            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
-                PlaySound(shootingsfx);
+                PlaySound(sound->shootingsfx);
 
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = bulltxt->bull});
@@ -66,13 +67,13 @@ void shoot(int tab, int *ammoPointer) {
                         .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
                         .applies = {create_component<Gravity>({.g = 100})}
                         });
-                std::cout << "Shooting!\n";
+                //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoPointer[2] >= 3 && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
-                PlaySound(shootingsfx);
+                PlaySound(sound->shootingsfx);
 
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = bulltxt->bull});
@@ -96,13 +97,13 @@ void shoot(int tab, int *ammoPointer) {
                 bullet3->add_component<Gravity>({.g = -500.0});
                 bullet3->add_component<DestroyBeyondWorld>({});
                 
-                if (ammoPointer[2] >= 3) ammoPointer[2] -= 3;
+                if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoPointer[1] >= 2 && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
-                PlaySound(shootingsfx);
+                PlaySound(sound->shootingsfx);
                 
                 Entity* bullet = entities->new_entity();
                 bullet->add_component<Render>({.txt = bulltxt->bull});
@@ -119,7 +120,7 @@ void shoot(int tab, int *ammoPointer) {
                 bullet2->add_component<Gravity>({.g = -600.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
              
-                if(ammoPointer[1] >= 2) ammoPointer[1] -= 2;
+                if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
@@ -223,26 +224,29 @@ void outlineColliders() {
         }
     }
 }
-void ammoCounter(int type, int *ammoPointer){
+
+void ammoCounter(int type){ 
+    auto ammoComp = resources->get_component<AmmoCounter>();
+    
     if(type == 1){
 			DrawText("o", 875,675,35,BLACK);
 			DrawText("o", 885,675,35,BLACK);
 			DrawText("1x", 920,675,35,BLACK);
-			DrawText(std::to_string(ammoPointer[1]).c_str(), 875,705,25,BLACK);
-			DrawText(std::to_string(ammoPointer[2]).c_str(), 875,730,25,BLACK);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,BLACK);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,BLACK);
 		}
 		else if(type == 2){ 
 			DrawText("o", 875,675,25,BLACK);
 			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoPointer[1]).c_str(), 875,700,35,BLACK);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,BLACK);
 			DrawText("2x", 920,700,35,BLACK);
-			DrawText(std::to_string(ammoPointer[2]).c_str(), 875,730,25,BLACK);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,BLACK);
 		}
 		else if(type == 3){ 
 			DrawText("o", 875,675,25,BLACK);
 			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoPointer[1]).c_str(), 875,700,25,BLACK);
-			DrawText(std::to_string(ammoPointer[2]).c_str(), 875,730,35,BLACK);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,BLACK);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,BLACK);
 			DrawText("3x", 920,730,35,BLACK);
 		}
 
