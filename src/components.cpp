@@ -1,5 +1,6 @@
 #include "components.h"
 #include "ecs.h"
+#include "raylib.h"
 #include "resources.h"
 #include <cmath>
 #include <string>
@@ -55,6 +56,12 @@ void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
+                bullet->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
@@ -161,6 +168,57 @@ void destroyBeyondWorld() {
     }
 }
 
+// O brachu..
+typedef struct {
+    Entity *ent;
+    std::vector<Hitbox *> hitboxes;
+    Position *pos;
+} CollideCandidate;
+
+void detectCollision() {
+    // Szuka entity z pozycja i hitboxem
+    std::vector<CollideCandidate> colliders;
+    std::vector<CollideCandidate> collidees;
+    for (Entity *collider : entities->get()) {
+        CollideCandidate candidate = {.ent = collider};
+        candidate.hitboxes = collider->get_components<Hitbox>();
+        candidate.pos = collider->get_component<Position>();
+        if (!candidate.pos || candidate.hitboxes.empty()) continue; 
+        colliders.push_back(candidate);
+        collidees.push_back(candidate);
+    }
+
+    // Szukamy teraz czy cos ze soba kolliduje
+    for (CollideCandidate collider : colliders) {
+        for (CollideCandidate collidee : collidees) {
+            if (collider.ent == collidee.ent) continue;
+            for (Hitbox *colliderHitbox : collider.hitboxes) {
+                for (Hitbox *collideeHitbox : collidee.hitboxes) {
+                    if ((colliderHitbox->interactsWith & collideeHitbox->layer) == 0) continue; // Sprawdzenie layerow
+                    Area globalColliderHitbox = colliderHitbox->collisionBox + Vec2(collider.pos->x, collider.pos->y);
+                    Area globalCollideeHitbox = collideeHitbox->collisionBox + Vec2(collidee.pos->x, collidee.pos->y);
+                    if (globalColliderHitbox.overlaps(globalCollideeHitbox) == false) continue; // Sprawdzenie czy sie kolliduja
+                    for (ComponentHandle component : colliderHitbox->applies) {
+                        collidee.ent->add_component(component);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void outlineColliders() {
+    for (Entity *ent : entities->get()) {
+        auto col = ent->get_components<Hitbox>();
+        auto pos = ent->get_component<Position>();
+        if (!pos || col.empty()) continue;
+        for (Hitbox *hitbox : col) {
+            Area global_col = hitbox->collisionBox + Vec2(pos->x, pos->y);
+            DrawRectangleLines(global_col.left_up_corner.x, global_col.left_up_corner.y, global_col.getWidth(), global_col.getHeight(), YELLOW);
+        }
+    }
+}
 void ammoCounter(int type, int *ammoPointer){
     if(type == 1){
 			DrawText("o", 875,675,35,BLACK);

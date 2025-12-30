@@ -19,6 +19,10 @@ comp_id_t _Registry::_get_id(const char* name) {
     }
 }
 
+void Entity::add_component(ComponentHandle handle) {
+    this->components.push_back(handle);
+}
+
 Entity* Entities::new_entity() {
     Entity* ent = new Entity();
     this->ents.push_back(ent);

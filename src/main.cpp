@@ -42,6 +42,12 @@ int main ()
     rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
     rabbit->add_component<RestrictToWorld>({});	
 	rabbit->add_component<Shooting>({.cooldown = 0.0});
+
+    Entity* enemy = entities->new_entity();
+    enemy->add_component<Position>({.x = 500, .y = 100});
+    enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+    enemy->add_component<Hitbox>({.layer = HitboxLayer::Enemies, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
+	// game loop
 	
 /*
 	// ammunicja
@@ -84,6 +90,8 @@ int main ()
       arrowMovement(d);
       restrictToWorld(d);
       destroyBeyondWorld();
+    detectCollision();
+        outlineColliders();
 		ammoCounter(type, ammoPointer);
         //std::cout << "Entities: " << entities->get().size() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
