@@ -40,8 +40,12 @@ void shoot() {
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
-                bullet->add_component<Hitbox>({.layer = HitboxLayer::Bullets, .interactsWith = HitboxLayer::Enemies, .collisionBox = Area(Vec2(0,0), Vec2(100,200))});
-                bullet->add_component<Hitbox>({.layer = HitboxLayer::Bullets, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
+                bullet->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
@@ -125,7 +129,9 @@ void detectCollision() {
                     Area globalColliderHitbox = colliderHitbox->collisionBox + Vec2(collider.pos->x, collider.pos->y);
                     Area globalCollideeHitbox = collideeHitbox->collisionBox + Vec2(collidee.pos->x, collidee.pos->y);
                     if (globalColliderHitbox.overlaps(globalCollideeHitbox) == false) continue; // Sprawdzenie czy sie kolliduja
-                    std::cout << "Elo kolizja" << "\n";
+                    for (ComponentHandle component : colliderHitbox->applies) {
+                        collidee.ent->add_component(component);
+                    }
                 }
             }
         }
