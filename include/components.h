@@ -23,7 +23,13 @@ void renderThings(float d);
 typedef struct{
     float cooldown;
 } Shooting;
-void shoot();
+void shoot(int tab, int *ammoPointer, Sound shootingsfx, Texture2D bulletTexture);
+
+typedef struct{
+    float x;
+    float y;
+} Velocity;
+void updateVelocity(float d);
 
 typedef struct {
     float northSpeed;
@@ -56,3 +62,6 @@ typedef struct {
 } Hitbox;
 void detectCollision();
 void outlineColliders();
+typedef struct {
+} AmmoCounter;
+void ammoCounter(int type, int *ammoPointer);
