@@ -41,6 +41,7 @@ void shoot() {
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
                 bullet->add_component<Hitbox>({.layer = HitboxLayer::Bullets, .interactsWith = HitboxLayer::Enemies, .collisionBox = Area(Vec2(0,0), Vec2(100,200))});
+                bullet->add_component<Hitbox>({.layer = HitboxLayer::Bullets, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
               //  cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
 
@@ -94,36 +95,52 @@ void destroyBeyondWorld() {
     }
 }
 
-void dispatchColision(int events) {
-}
+// O brachu..
+typedef struct {
+    Entity *ent;
+    std::vector<Hitbox *> hitboxes;
+    Position *pos;
+} CollideCandidate;
 
 void detectCollision() {
-    for (Entity *ent : entities->get()) {
-        auto col = ent->get_component<Hitbox>();
-        auto pos = ent->get_component<Position>();
-        if (!pos || !col) continue;
-        for (Entity *ent_2 : entities->get()) {
-            auto ent_2_col = ent_2->get_component<Hitbox>();
-            auto ent_2_pos = ent_2->get_component<Position>();
-            if (!ent_2_col || !ent_2_pos) continue;
-            if (ent_2 == ent) continue;
+    // Szuka entity z pozycja i hitboxem
+    std::vector<CollideCandidate> colliders;
+    std::vector<CollideCandidate> collidees;
+    for (Entity *collider : entities->get()) {
+        CollideCandidate candidate = {.ent = collider};
+        candidate.hitboxes = collider->get_components<Hitbox>();
+        candidate.pos = collider->get_component<Position>();
+        if (!candidate.pos || candidate.hitboxes.empty()) continue; 
+        colliders.push_back(candidate);
+        collidees.push_back(candidate);
+    }
 
-            // Jako ze collisionBox jest relatywny do swojego entity to zamieniam na kordynaty absolutne
-            Area global_col = col->collisionBox + Vec2(pos->x, pos->y);
-            Area global_col_2 = ent_2_col->collisionBox + Vec2(ent_2_pos->x, ent_2_pos->y);
-            if ((ent_2_col->layer & col->interactsWith) == 0) continue; // Jak jest na innym layerze to sie nie kolliduje
-            if (!global_col.overlaps(global_col_2)) continue; // Jak nie koliduje to nie koliduje
-            std::cout << "Elo kolizja" << "\n";
+    // Szukamy teraz czy cos ze soba kolliduje
+    for (CollideCandidate collider : colliders) {
+        for (CollideCandidate collidee : collidees) {
+            if (collider.ent == collidee.ent) continue;
+            for (Hitbox *colliderHitbox : collider.hitboxes) {
+                for (Hitbox *collideeHitbox : collidee.hitboxes) {
+                    if ((colliderHitbox->interactsWith & collideeHitbox->layer) == 0) continue; // Sprawdzenie layerow
+                    Area globalColliderHitbox = colliderHitbox->collisionBox + Vec2(collider.pos->x, collider.pos->y);
+                    Area globalCollideeHitbox = collideeHitbox->collisionBox + Vec2(collidee.pos->x, collidee.pos->y);
+                    if (globalColliderHitbox.overlaps(globalCollideeHitbox) == false) continue; // Sprawdzenie czy sie kolliduja
+                    std::cout << "Elo kolizja" << "\n";
+                }
+            }
         }
     }
+
 }
 
 void outlineColliders() {
     for (Entity *ent : entities->get()) {
-        auto col = ent->get_component<Hitbox>();
+        auto col = ent->get_components<Hitbox>();
         auto pos = ent->get_component<Position>();
-        if (!pos || !col) continue;
-        Area global_col = col->collisionBox + Vec2(pos->x, pos->y);
-        DrawRectangleLines(global_col.left_up_corner.x, global_col.left_up_corner.y, global_col.getWidth(), global_col.getHeight(), YELLOW);
+        if (!pos || col.empty()) continue;
+        for (Hitbox *hitbox : col) {
+            Area global_col = hitbox->collisionBox + Vec2(pos->x, pos->y);
+            DrawRectangleLines(global_col.left_up_corner.x, global_col.left_up_corner.y, global_col.getWidth(), global_col.getHeight(), YELLOW);
+        }
     }
 }
