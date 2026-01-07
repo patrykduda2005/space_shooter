@@ -16,28 +16,30 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 
 bool Pause = false;
+bool Datalog = false;
 
 int main ()
 {
-	SetTargetFPS(144);
-    initResources();
 	// Tell the window to use vsync and work on high DPI displays
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	//SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
 
 	// Create the window and OpenGL context
-    auto worldBorder = resources->get_component<WorldBorder>();
+	initWorldSize();
+   auto worldBorder = resources->get_component<WorldBorder>();
 	InitWindow(worldBorder->width, worldBorder->height, "RISE OF THE WIELKI PIEC");
+	SetTargetFPS(150);
 	InitAudioDevice();				  // Initialize audio device
 	initResources();
-	initSoundResources();
-	initBulletTexture();
 	initAmmoCounter();
 
-	Rectangle resumeBtn = {450, 200, 200, 50};	
+	Rectangle resumeBtn = {400, 185, 200, 50};	
+	Rectangle exitBtn = {400, 445, 200, 50};
 
 	SetExitKey(KEY_NULL);
 
 	SearchAndSetResourceDir("resources");
+	
 
 	int type = 1;
 
@@ -62,7 +64,7 @@ int main ()
 		Vector2 mousePosition = GetMousePosition();
 		  
 		if(IsKeyPressed(KEY_ESCAPE)) Pause = !Pause;
-
+		if(IsKeyPressed(KEY_F3)) Datalog = !Datalog;
 
 		// drawing
 		BeginDrawing();
@@ -79,9 +81,17 @@ int main ()
 			if (IsKeyPressed(KEY_TWO)) type = 2;
 			if (IsKeyPressed(KEY_THREE)) type = 3;
 			
+			if(Datalog){
+				DrawText("FPS:", 50,700,15,BLACK);
+				DrawText(std::to_string(GetFPS()).c_str(), 120,700,15,BLACK); 
+				DrawText("Entities:", 50,720,15,BLACK);
+				DrawText(std::to_string(entities->get().size()).c_str(), 150,720,15,BLACK);
+				DrawText("x:", 50,740,15,BLACK);
+				DrawText(std::to_string(mousePosition.x).c_str(), 80,740,15,BLACK);
+				DrawText("y:", 175,740,15,BLACK);	
+				DrawText(std::to_string(mousePosition.y).c_str(), 205,740,15,BLACK);
 			
-			DrawText("FPS:", 50,700,25,BLACK);
-			DrawText(std::to_string(GetFPS()).c_str(), 120,700,25,BLACK); 
+			}
 
 			shoot(type);
 		   updateGravity(d);
@@ -96,26 +106,40 @@ int main ()
 		} 
 		else {
 			DrawText("PAUSED", 400,100,50,RED);
-			DrawText("Resume", 450, 200, 25, RED);
+
+			if(Datalog){
+				DrawText("x:", 50,700,15,BLACK);
+				DrawText(std::to_string(mousePosition.x).c_str(), 80,700,15,BLACK);
+				DrawText("y:", 175,700,15,BLACK);	
+				DrawText(std::to_string(mousePosition.y).c_str(), 205,700,15,BLACK);
+			}
+			
+			
+
 			if (CheckCollisionPointRec(mousePosition, resumeBtn)) {
+				DrawText("Resume", 450, 200, 25, DARKGRAY);
             if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
                 Pause = false; // Wracamy do gry
             }
-        }
+        } else {
+				DrawText("Resume", 450, 200, 25, RED);
+		  }
+
+		  if(CheckCollisionPointRec(mousePosition, exitBtn)){
+				DrawText("Exit", 470, 460, 25, DARKGRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+					 break; // Exit the game loop
+				}
+		  } else {
+				DrawText("Exit", 470, 460, 25, RED);
+		  }
+
+		  //DrawText("")
 		
 		
 		}
-		
-        //std::cout << "Entities: " << entities->get().size() << "\n";
-		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}
-
-	// cleanup
-	// unload our texture so it can be cleaned up
-	//UnloadTexture(wabbit);
-
-	// destroy the window and cleanup the OpenGL context
 		
 	unLoadResources();
 	CloseAudioDevice();

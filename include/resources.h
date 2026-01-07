@@ -9,17 +9,24 @@ typedef struct {
     float height;
 } WorldBorder;
 
-void initResources();
+void initWorldSize();
 
 typedef struct {
     Sound shootingsfx;
-} SoundResources;
-void initSoundResources();
-
-typedef struct {
     Texture2D bull;
-}BulletTexture;
-void initBulletTexture();
+} soundTextureResources;
+
+void initResources();
+
+// typedef struct {
+//     Sound shootingsfx;
+// } SoundResources;
+// //void initSoundResources();
+
+// typedef struct {
+//     Texture2D bull;
+// }BulletTexture;
+// //void initBulletTexture();
 
 void unLoadResources();
 

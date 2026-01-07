@@ -46,18 +46,17 @@ void shoot(int tab){//, int *ammoPointer) {
         auto pos = ent->get_component<Position>();
         auto shootComp = ent->get_component<Shooting>();
         auto vel = ent->get_component<Velocity>();
-        auto bulltxt = resources->get_component<BulletTexture>();
-        auto sound = resources->get_component<SoundResources>();
+        auto res = resources->get_component<soundTextureResources>();   
         auto ammoComp = resources->get_component<AmmoCounter>();
 
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
             if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
-                PlaySound(sound->shootingsfx);
+                PlaySound(res->shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulltxt->bull});
+                bullet->add_component<Render>({.txt = res->bull});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
@@ -69,33 +68,50 @@ void shoot(int tab){//, int *ammoPointer) {
                         });
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
-
             }
             else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
-                PlaySound(sound->shootingsfx);
+                PlaySound(res->shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulltxt->bull});
+                bullet->add_component<Render>({.txt = res->bull});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
+                bullet->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = bulltxt->bull});
+                bullet2->add_component<Render>({.txt = res->bull});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 150});
                 bullet2->add_component<Gravity>({.g = -500.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
+                bullet2->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
                 
                 // Create a third bullet entity
                 Entity* bullet3 = entities->new_entity();
-                bullet3->add_component<Render>({.txt = bulltxt->bull});
+                bullet3->add_component<Render>({.txt = res->bull});
                 bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet3->add_component<Velocity>({.x = -150});
                 bullet3->add_component<Gravity>({.g = -500.0});
                 bullet3->add_component<DestroyBeyondWorld>({});
+                bullet3->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
                 
                 if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -103,22 +119,34 @@ void shoot(int tab){//, int *ammoPointer) {
             }
             else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
-                PlaySound(sound->shootingsfx);
+                PlaySound(res->shootingsfx);
                 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulltxt->bull});
+                bullet->add_component<Render>({.txt = res->bull});
                 bullet->add_component<Velocity>({.x = -100});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -600.0});
                 bullet->add_component<DestroyBeyondWorld>({});
+                bullet->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = bulltxt->bull});
+                bullet2->add_component<Render>({.txt = res->bull});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 100});
                 bullet2->add_component<Gravity>({.g = -600.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
+                bullet2->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
              
                 if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
