@@ -259,25 +259,25 @@ void ammoCounter(int type){
     auto ammoComp = resources->get_component<AmmoCounter>();
     
     if(type == 1){
-			DrawText("o", 875,675,35,BLACK);
-			DrawText("o", 885,675,35,BLACK);
-			DrawText("1x", 920,675,35,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,BLACK);
+			DrawText("o", 875,675,35,WHITE);
+			DrawText("o", 885,675,35,WHITE);
+			DrawText("1x", 920,675,35,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
 		}
 		else if(type == 2){ 
-			DrawText("o", 875,675,25,BLACK);
-			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,BLACK);
-			DrawText("2x", 920,700,35,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,BLACK);
+			DrawText("o", 875,675,25,WHITE);
+			DrawText("o", 885,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,WHITE);
+			DrawText("2x", 920,700,35,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
 		}
 		else if(type == 3){ 
-			DrawText("o", 875,675,25,BLACK);
-			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,BLACK);
-			DrawText("3x", 920,730,35,BLACK);
+			DrawText("o", 875,675,25,WHITE);
+			DrawText("o", 885,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,WHITE);
+			DrawText("3x", 920,730,35,WHITE);
 		}
 
 }

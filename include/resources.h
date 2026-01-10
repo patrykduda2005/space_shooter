@@ -14,6 +14,7 @@ void initWorldSize();
 typedef struct {
     Sound shootingsfx;
     Texture2D bull;
+    Texture2D background;
 } soundTextureResources;
 
 void initResources();

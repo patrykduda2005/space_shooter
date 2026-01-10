@@ -15,15 +15,16 @@ void initResources(){
     resources->add_component<soundTextureResources>({
         .shootingsfx = LoadSound("resources/shoot.wav"),
         .bull = LoadTexture("resources/surowka.png"),
+        .background = LoadTexture("resources/tlo.png"),
     });
 }
 
 void initKeyBinds(){
     resources->add_component<KeyBinds>({
-        .up = KEY_UP,
-        .down = KEY_DOWN,
-        .left = KEY_LEFT,
-        .right = KEY_RIGHT,
+        .up = KEY_W,
+        .down = KEY_S,
+        .left = KEY_A,
+        .right = KEY_D,
         .shoot = KEY_SPACE,
         .type_shoot1 = KEY_ONE,
         .type_shoot2 = KEY_TWO,
