@@ -65,3 +65,5 @@ void outlineColliders();
 
 
 void ammoCounter(int type); //, int *ammoPointer);
+
+const char* GetKeyText(int key);

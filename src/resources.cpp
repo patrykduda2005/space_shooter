@@ -17,6 +17,19 @@ void initResources(){
         .bull = LoadTexture("resources/surowka.png"),
     });
 }
+
+void initKeyBinds(){
+    resources->add_component<KeyBinds>({
+        .up = KEY_UP,
+        .down = KEY_DOWN,
+        .left = KEY_LEFT,
+        .right = KEY_RIGHT,
+        .shoot = KEY_SPACE,
+        .type_shoot1 = KEY_ONE,
+        .type_shoot2 = KEY_TWO,
+        .type_shoot3 = KEY_THREE,
+    });
+}
 /*
 void initBulletTexture(){
     resources->add_component<BulletTexture>({
@@ -33,6 +46,12 @@ void unLoadResources(){
     if(bulletTexComp){
         UnloadTexture(bulletTexComp->bull);
     }
+    auto musicComp = resources->get_component<MusicResources>();
+    if(musicComp){
+        UnloadMusicStream(musicComp->backgroundMusic);
+        UnloadMusicStream(musicComp->menuMusic);
+    }
+
 }
 
 void initAmmoCounter(){
@@ -42,5 +61,10 @@ void initAmmoCounter(){
     });
 }
 
-
+void initMusicResources(){
+    resources->add_component<MusicResources>({
+        .backgroundMusic = LoadMusicStream("resources/gamemusic.wav"),
+        .menuMusic = LoadMusicStream("resources/menumusic.wav"),
+    });
+}
 

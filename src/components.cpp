@@ -41,6 +41,7 @@ void renderThings(float d) {
 }
 
 void shoot(int tab){//, int *ammoPointer) {
+    auto keyb = resources->get_component<KeyBinds>();
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
@@ -51,7 +52,7 @@ void shoot(int tab){//, int *ammoPointer) {
 
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
-            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 1) {
+            if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
                 PlaySound(res->shootingsfx);
 
@@ -69,7 +70,7 @@ void shoot(int tab){//, int *ammoPointer) {
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
@@ -117,7 +118,7 @@ void shoot(int tab){//, int *ammoPointer) {
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
                 
@@ -161,11 +162,12 @@ void arrowMovement(float d) {
         auto ent = entities->get()[i];
         auto arr = ent->get_component<ArrowMovement>();
         auto pos = ent->get_component<Position>();
+        auto keyb = resources->get_component<KeyBinds>();
         if (arr && pos) {
-            if (IsKeyDown(KEY_RIGHT)) pos->x += arr->eastSpeed * d;
-            if (IsKeyDown(KEY_LEFT)) pos->x -= arr->westSpeed * d;
-            if (IsKeyDown(KEY_UP)) pos->y -= arr->northSpeed * d;
-            if (IsKeyDown(KEY_DOWN)) pos->y += arr->southSpeed * d; 
+            if (IsKeyDown(keyb->right)) pos->x += arr->eastSpeed * d;
+            if (IsKeyDown(keyb->left)) pos->x -= arr->westSpeed * d;
+            if (IsKeyDown(keyb->up)) pos->y -= arr->northSpeed * d;
+            if (IsKeyDown(keyb->down)) pos->y += arr->southSpeed * d; 
         }
     }
 }
@@ -278,4 +280,29 @@ void ammoCounter(int type){
 			DrawText("3x", 920,730,35,BLACK);
 		}
 
+}
+
+
+const char* GetKeyText(int key) {
+    switch (key) {
+        // Ręczna obsługa klawiszy, których Raylib nie wyświetla poprawnie
+        case KEY_SPACE:         return "SPACE";
+        case KEY_LEFT_SHIFT:    return "L-SHIFT";
+        case KEY_RIGHT_SHIFT:   return "R-SHIFT";
+        case KEY_LEFT_CONTROL:  return "L-CTRL";
+        case KEY_RIGHT_CONTROL: return "R-CTRL";
+        case KEY_LEFT_ALT:      return "L-ALT";
+        case KEY_TAB:           return "TAB";
+        case KEY_ENTER:         return "ENTER";
+        case KEY_BACKSPACE:     return "BACK";
+        
+        // Strzałki (często też są puste w standardowym GetKeyName)
+        case KEY_UP:    return "UP";
+        case KEY_DOWN:  return "DOWN";
+        case KEY_LEFT:  return "LEFT";
+        case KEY_RIGHT: return "RIGHT";
+
+        // Dla całej reszty używamy wbudowanej funkcji Rayliba
+        default: return GetKeyName(key);
+    }
 }

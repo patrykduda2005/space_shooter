@@ -18,6 +18,18 @@ typedef struct {
 
 void initResources();
 
+typedef struct{
+    KeyboardKey up;
+    KeyboardKey down;
+    KeyboardKey left;  
+    KeyboardKey right;
+    KeyboardKey shoot;
+    KeyboardKey type_shoot1;
+    KeyboardKey type_shoot2;
+    KeyboardKey type_shoot3;
+} KeyBinds;
+void initKeyBinds();
+
 // typedef struct {
 //     Sound shootingsfx;
 // } SoundResources;
@@ -35,5 +47,11 @@ typedef struct {
     int currentAmmo[3];
 } AmmoCounter;
 void initAmmoCounter();
+
+typedef struct{
+    Music backgroundMusic;
+    Music menuMusic;
+} MusicResources;
+void initMusicResources();
 
 extern Entity *resources;
