@@ -16,6 +16,8 @@ class Vec2 {
     Vec2(float x, float y);
     Vec2 operator+(Vec2 rhs);
     Vec2 operator-(Vec2 rhs);
+    Vec2 operator*(float rhs);
+    friend std::ostream& operator<<(std::ostream& os, Vec2 v);
 };
 
 class Area {
@@ -24,6 +26,7 @@ class Area {
     Vec2 right_down_corner;
     Area(Vec2 left_up_corner, Vec2 right_down_corner);
     Area operator+(Vec2 new_reference_point);
+    Area operator-(Vec2 new_reference_point);
     friend std::ostream& operator<<(std::ostream& os, Area a);
     Vec2 get_middle();
     float getWidth();
