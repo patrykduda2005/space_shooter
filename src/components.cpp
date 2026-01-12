@@ -96,6 +96,23 @@ Entity* shatterBullet(Position pos) {
     return bullet;
 }
 
+Entity* blackBullet(Position pos) {
+    Entity* bullet = basicBullet(pos);
+    bullet->get_component<Gravity>()->g = -100;
+    bullet->remove_component<Hitbox>();
+    bullet->add_component<Delay>({
+            .comps = {create_component<Destroy>({})},
+            .timestamp = GetTime(),
+            .delay = 3,
+            });
+    bullet->add_component<Delay>({
+            .comps = {create_component<BlackHole>({.g = 100})},
+            .timestamp = GetTime(),
+            .delay = 1,
+            });
+    return bullet;
+}
+
 void shoot(int tab){//, int *ammoPointer) {
     auto keyb = resources->get_component<KeyBinds>();
     for (int i = 0; i < entities->get().size(); i++) {
@@ -111,7 +128,7 @@ void shoot(int tab){//, int *ammoPointer) {
             if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
                 PlaySound(res->shootingsfx);
-                entities->attach(shatterBullet(*pos));
+                entities->attach(blackBullet(*pos));
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
@@ -374,13 +391,33 @@ void spawn() {
 
 void delay() {
     for (Entity* ent : entities->get()) {
-        auto delay = ent->get_component<Delay>();
-        if (!delay) continue;
-        if ((GetTime() - delay->timestamp) > delay->delay) {
-            for (ComponentHandle comp : delay->comps) {
-                ent->add_component(comp);
+        auto delays = ent->get_components<Delay>();
+        if (delays.empty()) continue;
+        for (Delay* delay : delays) {
+            if ((GetTime() - delay->timestamp) > delay->delay) {
+                for (ComponentHandle comp : delay->comps) {
+                    ent->add_component(comp);
+                }
+                ent->remove_component<Delay>();
             }
-            ent->remove_component<Delay>();
+        }
+    }
+}
+
+void suckToBlack(float d) {
+    for (Entity* ent : entities->get()) {
+        auto black = ent->get_component<BlackHole>();
+        auto pos = ent->get_component<Position>();
+        if (!black || !pos) continue;
+        for (Entity* suckee : entities->get()) {
+            if (suckee == ent) continue;
+            auto suckeePos = suckee->get_component<Position>();
+            auto suckeeblack = suckee->get_component<BlackHole>();
+            auto suckeeArrow = suckee->get_component<ArrowMovement>();
+            if (!suckeePos || suckeeblack || suckeeArrow) continue;
+            std::cout << "siema" << "\n";
+            suckeePos->x += ((pos->x - suckeePos->x) * d * black->g)/(std::abs(pos->x - suckeePos->x));
+            suckeePos->y += ((pos->y - suckeePos->y) * d * black->g)/(std::abs(pos->y - suckeePos->y));
         }
     }
 }

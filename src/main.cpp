@@ -162,6 +162,7 @@ int main ()
 			}
 
     	detectCollision();
+        suckToBlack(d);
             delay();
             spawn();
 		shoot(type);

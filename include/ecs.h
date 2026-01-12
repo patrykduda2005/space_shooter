@@ -99,6 +99,7 @@ Entity* Entity::remove_component() {
             ComponentHandle last_comp = this->components[this->components.size() - 1];
             this->components[i] = last_comp;
             this->components.pop_back();
+            return this;
         }
     }
     return this;

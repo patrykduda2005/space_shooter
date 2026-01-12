@@ -97,3 +97,8 @@ typedef struct {
     double delay;
 } Delay;
 void delay();
+
+typedef struct {
+    int g;
+} BlackHole;
+void suckToBlack(float d);
