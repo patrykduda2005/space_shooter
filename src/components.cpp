@@ -46,7 +46,7 @@ Entity* basicBullet(Position pos) {
             Vec2(res->bull.width, res->bull.height) * -0.5,
             Vec2(res->bull.width, res->bull.height) * 0.5
             );
-    Entity* bullet = entities->new_entity();
+    Entity* bullet = new Entity();
     bullet->add_component<Render>({.txt = res->bull});
     bullet->add_component<Position>({.x = pos.x, .y = pos.y-45});
     bullet->add_component<Gravity>({.g = -700.0});
@@ -65,6 +65,34 @@ Entity* sniperBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
     bullet->get_component<Gravity>()->g *= 2;
     Hitbox* hitbox = bullet->get_component<Hitbox>();
+    hitbox->applies = {create_component<Damage>({.dmg = 3})};
+    return bullet;
+}
+
+Entity* shatteredBullet(Position pos, Hitbox* hitbox) {
+    return basicBullet(pos)->remove_component<Hitbox>()
+        ->add_component<Delay>({
+                .comps = {
+                create_component(*hitbox)
+                },
+                .delay = 0.25,
+                });
+}
+
+Entity* shatterBullet(Position pos) {
+    Entity* bullet = basicBullet(pos);
+    Hitbox* hitbox = bullet->get_component<Hitbox>();
+    Entity* bullet2 = shatteredBullet(pos, hitbox);
+    bullet2->add_component<Velocity>({.x = 500});
+    Entity* bullet3 = shatteredBullet(pos, hitbox);
+    Entity* bullet4 = shatteredBullet(pos, hitbox);
+    bullet4->add_component<Velocity>({.x = -500});
+
+    hitbox->receives.push_back(create_component<Spawn>({.comps = {
+                bullet2,
+                bullet3,
+                bullet4,
+                }}));
     return bullet;
 }
 
@@ -83,7 +111,7 @@ void shoot(int tab){//, int *ammoPointer) {
             if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
                 PlaySound(res->shootingsfx);
-                Entity *bullet = basicBullet(*pos);
+                entities->attach(shatterBullet(*pos));
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
@@ -91,15 +119,17 @@ void shoot(int tab){//, int *ammoPointer) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
-                Entity* bullet = basicBullet(*pos);
+                entities->attach(basicBullet(*pos));
               
                 // Create a second bullet entity
                 Entity* bullet2 = basicBullet(*pos);
                 bullet2->add_component<Velocity>({.x = 150});
+                entities->attach(bullet2);
                 
                 // Create a third bullet entity
                 Entity* bullet3 = basicBullet(*pos);
                 bullet3->add_component<Velocity>({.x = -150});
+                entities->attach(bullet3);
                 
                 if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -111,10 +141,12 @@ void shoot(int tab){//, int *ammoPointer) {
                 
                 Entity* bullet = basicBullet(*pos);
                 bullet->add_component<Velocity>({.x = -100});
+                entities->attach(bullet);
               
                 // Create a second bullet entity
                 Entity* bullet2 = basicBullet(*pos);
                 bullet2->add_component<Velocity>({.x = 100});
+                entities->attach(bullet2);
              
                 if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -318,5 +350,37 @@ const char* GetKeyText(int key) {
 
         // Dla całej reszty używamy wbudowanej funkcji Rayliba
         default: return GetKeyName(key);
+    }
+}
+
+void spawn() {
+    for (Entity* ent : entities->get()) {
+        auto spawn = ent->get_component<Spawn>();
+        if (!spawn) continue;
+        for (Entity* spawned : spawn->comps) {
+            Position* hostPos;
+            Delay* delay;
+            if ((hostPos = ent->get_component<Position>()))
+                *spawned->get_component<Position>() = *hostPos;
+            if ((delay = spawned->get_component<Delay>())) {
+                delay->timestamp = GetTime();
+                //spawned->add_component<Delay>(*delay);
+            }
+            entities->attach(spawned);
+        }
+        ent->remove_component<Spawn>();
+    }
+}
+
+void delay() {
+    for (Entity* ent : entities->get()) {
+        auto delay = ent->get_component<Delay>();
+        if (!delay) continue;
+        if ((GetTime() - delay->timestamp) > delay->delay) {
+            for (ComponentHandle comp : delay->comps) {
+                ent->add_component(comp);
+            }
+            ent->remove_component<Delay>();
+        }
     }
 }

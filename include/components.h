@@ -85,3 +85,15 @@ void die();
 void ammoCounter(int type); //, int *ammoPointer);
 
 const char* GetKeyText(int key);
+
+typedef struct {
+    std::vector<Entity*> comps;
+} Spawn;
+void spawn();
+
+typedef struct {
+    std::vector<ComponentHandle> comps;
+    double timestamp;
+    double delay;
+} Delay;
+void delay();
