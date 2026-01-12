@@ -83,3 +83,5 @@ void displayhp();
 void die();
 
 void ammoCounter(int type); //, int *ammoPointer);
+
+const char* GetKeyText(int key);

@@ -41,23 +41,23 @@ void renderThings(float d) {
 }
 
 void shoot(int tab){//, int *ammoPointer) {
+    auto keyb = resources->get_component<KeyBinds>();
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
         auto shootComp = ent->get_component<Shooting>();
         auto vel = ent->get_component<Velocity>();
-        auto bulltxt = resources->get_component<BulletTexture>();
-        auto sound = resources->get_component<SoundResources>();
+        auto res = resources->get_component<soundTextureResources>();   
         auto ammoComp = resources->get_component<AmmoCounter>();
 
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
-            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 1) {
+            if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
-                PlaySound(sound->shootingsfx);
+                PlaySound(res->shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulltxt->bull});
+                bullet->add_component<Render>({.txt = res->bull});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -700.0});
                 bullet->add_component<DestroyBeyondWorld>({});
@@ -70,56 +70,85 @@ void shoot(int tab){//, int *ammoPointer) {
                         });
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
-
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
-                PlaySound(sound->shootingsfx);
+                PlaySound(res->shootingsfx);
 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulltxt->bull});
+                bullet->add_component<Render>({.txt = res->bull});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -500.0});
                 bullet->add_component<DestroyBeyondWorld>({});
+                bullet->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = bulltxt->bull});
+                bullet2->add_component<Render>({.txt = res->bull});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 150});
                 bullet2->add_component<Gravity>({.g = -500.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
+                bullet2->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
                 
                 // Create a third bullet entity
                 Entity* bullet3 = entities->new_entity();
-                bullet3->add_component<Render>({.txt = bulltxt->bull});
+                bullet3->add_component<Render>({.txt = res->bull});
                 bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet3->add_component<Velocity>({.x = -150});
                 bullet3->add_component<Gravity>({.g = -500.0});
                 bullet3->add_component<DestroyBeyondWorld>({});
+                bullet3->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
                 
                 if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
-                PlaySound(sound->shootingsfx);
+                PlaySound(res->shootingsfx);
                 
                 Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = bulltxt->bull});
+                bullet->add_component<Render>({.txt = res->bull});
                 bullet->add_component<Velocity>({.x = -100});
                 bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet->add_component<Gravity>({.g = -600.0});
                 bullet->add_component<DestroyBeyondWorld>({});
+                bullet->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
               
                 // Create a second bullet entity
                 Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = bulltxt->bull});
+                bullet2->add_component<Render>({.txt = res->bull});
                 bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
                 bullet2->add_component<Velocity>({.x = 100});
                 bullet2->add_component<Gravity>({.g = -600.0});
                 bullet2->add_component<DestroyBeyondWorld>({});
+                bullet2->add_component<Hitbox>({
+                        .layer = HitboxLayer::Bullets, 
+                        .interactsWith = HitboxLayer::Enemies, 
+                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
+                        .applies = {create_component<Gravity>({.g = 100})}
+                        });
              
                 if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -134,11 +163,12 @@ void arrowMovement(float d) {
         auto ent = entities->get()[i];
         auto arr = ent->get_component<ArrowMovement>();
         auto pos = ent->get_component<Position>();
+        auto keyb = resources->get_component<KeyBinds>();
         if (arr && pos) {
-            if (IsKeyDown(KEY_RIGHT)) pos->x += arr->eastSpeed * d;
-            if (IsKeyDown(KEY_LEFT)) pos->x -= arr->westSpeed * d;
-            if (IsKeyDown(KEY_UP)) pos->y -= arr->northSpeed * d;
-            if (IsKeyDown(KEY_DOWN)) pos->y += arr->southSpeed * d; 
+            if (IsKeyDown(keyb->right)) pos->x += arr->eastSpeed * d;
+            if (IsKeyDown(keyb->left)) pos->x -= arr->westSpeed * d;
+            if (IsKeyDown(keyb->up)) pos->y -= arr->northSpeed * d;
+            if (IsKeyDown(keyb->down)) pos->y += arr->southSpeed * d; 
         }
     }
 }
@@ -241,25 +271,25 @@ void ammoCounter(int type){
     auto ammoComp = resources->get_component<AmmoCounter>();
     
     if(type == 1){
-			DrawText("o", 875,675,35,BLACK);
-			DrawText("o", 885,675,35,BLACK);
-			DrawText("1x", 920,675,35,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,BLACK);
+			DrawText("o", 875,675,35,WHITE);
+			DrawText("o", 885,675,35,WHITE);
+			DrawText("1x", 920,675,35,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
 		}
 		else if(type == 2){ 
-			DrawText("o", 875,675,25,BLACK);
-			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,BLACK);
-			DrawText("2x", 920,700,35,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,BLACK);
+			DrawText("o", 875,675,25,WHITE);
+			DrawText("o", 885,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,WHITE);
+			DrawText("2x", 920,700,35,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
 		}
 		else if(type == 3){ 
-			DrawText("o", 875,675,25,BLACK);
-			DrawText("o", 885,675,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,BLACK);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,BLACK);
-			DrawText("3x", 920,730,35,BLACK);
+			DrawText("o", 875,675,25,WHITE);
+			DrawText("o", 885,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,WHITE);
+			DrawText("3x", 920,730,35,WHITE);
 		}
 
 }
@@ -299,5 +329,29 @@ void die() {
     for (Entity* ent : entities->get()) {
         auto hp = ent->get_component<Hp>();
         if (hp && hp->hp <= 0) entities->kill_entity(ent);
+    }
+}
+
+const char* GetKeyText(int key) {
+    switch (key) {
+        // Ręczna obsługa klawiszy, których Raylib nie wyświetla poprawnie
+        case KEY_SPACE:         return "SPACE";
+        case KEY_LEFT_SHIFT:    return "L-SHIFT";
+        case KEY_RIGHT_SHIFT:   return "R-SHIFT";
+        case KEY_LEFT_CONTROL:  return "L-CTRL";
+        case KEY_RIGHT_CONTROL: return "R-CTRL";
+        case KEY_LEFT_ALT:      return "L-ALT";
+        case KEY_TAB:           return "TAB";
+        case KEY_ENTER:         return "ENTER";
+        case KEY_BACKSPACE:     return "BACK";
+        
+        // Strzałki (często też są puste w standardowym GetKeyName)
+        case KEY_UP:    return "UP";
+        case KEY_DOWN:  return "DOWN";
+        case KEY_LEFT:  return "LEFT";
+        case KEY_RIGHT: return "RIGHT";
+
+        // Dla całej reszty używamy wbudowanej funkcji Rayliba
+        default: return GetKeyName(key);
     }
 }

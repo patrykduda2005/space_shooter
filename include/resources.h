@@ -9,17 +9,37 @@ typedef struct {
     float height;
 } WorldBorder;
 
-void initResources();
+void initWorldSize();
 
 typedef struct {
     Sound shootingsfx;
-} SoundResources;
-void initSoundResources();
-
-typedef struct {
     Texture2D bull;
-}BulletTexture;
-void initBulletTexture();
+    Texture2D background;
+} soundTextureResources;
+
+void initResources();
+
+typedef struct{
+    KeyboardKey up;
+    KeyboardKey down;
+    KeyboardKey left;  
+    KeyboardKey right;
+    KeyboardKey shoot;
+    KeyboardKey type_shoot1;
+    KeyboardKey type_shoot2;
+    KeyboardKey type_shoot3;
+} KeyBinds;
+void initKeyBinds();
+
+// typedef struct {
+//     Sound shootingsfx;
+// } SoundResources;
+// //void initSoundResources();
+
+// typedef struct {
+//     Texture2D bull;
+// }BulletTexture;
+// //void initBulletTexture();
 
 void unLoadResources();
 
@@ -28,5 +48,11 @@ typedef struct {
     int currentAmmo[3];
 } AmmoCounter;
 void initAmmoCounter();
+
+typedef struct{
+    Music backgroundMusic;
+    Music menuMusic;
+} MusicResources;
+void initMusicResources();
 
 extern Entity *resources;
