@@ -65,7 +65,8 @@ void shoot(int tab){//, int *ammoPointer) {
                         .layer = HitboxLayer::Bullets, 
                         .interactsWith = HitboxLayer::Enemies, 
                         .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
+                        .receives = {create_component<Destroy>({})},
+                        .applies = {create_component<Destroy>({})}
                         });
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -203,6 +204,9 @@ void detectCollision() {
                     Area globalColliderHitbox = colliderHitbox->collisionBox + Vec2(collider.pos->x, collider.pos->y);
                     Area globalCollideeHitbox = collideeHitbox->collisionBox + Vec2(collidee.pos->x, collidee.pos->y);
                     if (globalColliderHitbox.overlaps(globalCollideeHitbox) == false) continue; // Sprawdzenie czy sie kolliduja
+                    for (ComponentHandle component : colliderHitbox->receives) {
+                        collider.ent->add_component(component);
+                    }
                     for (ComponentHandle component : colliderHitbox->applies) {
                         collidee.ent->add_component(component);
                     }
@@ -222,6 +226,14 @@ void outlineColliders() {
             Area global_col = hitbox->collisionBox + Vec2(pos->x, pos->y);
             DrawRectangleLines(global_col.left_up_corner.x, global_col.left_up_corner.y, global_col.getWidth(), global_col.getHeight(), YELLOW);
         }
+    }
+}
+
+void destroy() {
+    for (Entity *ent : entities->get()) {
+        auto del = ent->get_component<Destroy>();
+        if (!del) continue;
+        entities->kill_entity(ent);
     }
 }
 

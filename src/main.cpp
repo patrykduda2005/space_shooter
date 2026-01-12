@@ -42,11 +42,20 @@ int main ()
     rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
     rabbit->add_component<RestrictToWorld>({});	
 	rabbit->add_component<Shooting>({.cooldown = 0.0});
+    rabbit->add_component<Hitbox>({
+            .layer = HitboxLayer::Players,
+            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
+            });
 
     Entity* enemy = entities->new_entity();
     enemy->add_component<Position>({.x = 500, .y = 100});
     enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    enemy->add_component<Hitbox>({.layer = HitboxLayer::Enemies, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
+    enemy->add_component<Hitbox>({
+            .layer = HitboxLayer::Enemies,
+            .interactsWith = HitboxLayer::Players,
+            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
+            .applies = {create_component<Destroy>({})}
+            });
 	// game loop
 	
 
@@ -81,6 +90,7 @@ int main ()
     	detectCollision();
       outlineColliders();
 		ammoCounter(type);
+        destroy();
 
         //std::cout << "Entities: " << entities->get().size() << "\n";
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
