@@ -4,15 +4,29 @@
 Vec2::Vec2(): x(0.0), y(0.0) {};
 Vec2::Vec2(float x, float y): x(x), y(y) {};
 Vec2 Vec2::operator+(Vec2 rhs) {
-    this->x += rhs.x;
-    this->y += rhs.y;
-    return *this;
+    Vec2 kopia = *this;
+    kopia.x += rhs.x;
+    kopia.y += rhs.y;
+    return kopia;
 }
 
 Vec2 Vec2::operator-(Vec2 rhs) {
-    this->x -= rhs.x;
-    this->y -= rhs.y;
-    return *this;
+    Vec2 kopia = *this;
+    kopia.x -= rhs.x;
+    kopia.y -= rhs.y;
+    return kopia;
+}
+
+Vec2 Vec2::operator*(float rhs) {
+    Vec2 kopia = *this;
+    kopia.x *= rhs;
+    kopia.y *= rhs;
+    return kopia;
+}
+
+std::ostream& operator<<(std::ostream& os, Vec2 v) {
+    os << "Vec2: (" << v.x << ", " << v.y << ")";
+    return os;
 }
 
 Area::Area(Vec2 left_up_corner, Vec2 right_down_corner) {
@@ -25,6 +39,13 @@ Area Area::operator+(Vec2 new_reference_point) {
     Area copy = Area(this->left_up_corner, this->right_down_corner);
     copy.left_up_corner = copy.left_up_corner + new_reference_point;
     copy.right_down_corner = copy.right_down_corner + new_reference_point;
+    return copy;
+}
+
+Area Area::operator-(Vec2 new_reference_point) {
+    Area copy = Area(this->left_up_corner, this->right_down_corner);
+    copy.left_up_corner = copy.left_up_corner - new_reference_point;
+    copy.right_down_corner = copy.right_down_corner - new_reference_point;
     return copy;
 }
 

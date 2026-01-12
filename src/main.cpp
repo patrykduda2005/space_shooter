@@ -15,6 +15,26 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "resources.h"
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
+void spawnPlayer() {
+    Vec2 textureSize = Vec2(66, 120);
+    Area size = Area(textureSize * -0.5, textureSize * 0.5);
+
+    Entity* rabbit = entities->new_entity();
+    rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+    rabbit->add_component<Position>({.x = 500, .y = 700});
+    rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
+    rabbit->add_component<RestrictToWorld>({});	
+	rabbit->add_component<Shooting>({.cooldown = 0.0});
+    rabbit->add_component<Hitbox>({
+            .layer = HitboxLayer::Players,
+            .collisionBox = size,
+            });
+    rabbit->add_component<Hp>({.hp = 10});
+    rabbit->add_component<HpOffset>({
+            .global = false,
+            .vec = size.left_up_corner - Vec2(0, 25),
+            });
+}
 
 bool Pause = true;
 bool Datalog = false;
@@ -61,17 +81,19 @@ int main ()
 	int type = 1;
 
 	//WIELKI PIEC
-    Entity* rabbit = entities->new_entity();
-    rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    rabbit->add_component<Position>({.x = 500, .y = 700});
-    rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
-    rabbit->add_component<RestrictToWorld>({});	
-	 rabbit->add_component<Shooting>({.cooldown = 0.0});
 
     Entity* enemy = entities->new_entity();
     enemy->add_component<Position>({.x = 500, .y = 100});
     enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    enemy->add_component<Hitbox>({.layer = HitboxLayer::Enemies, .interactsWith = HitboxLayer::Nothing, .collisionBox = Area(Vec2(0,0), Vec2(100,100))});
+    enemy->add_component<Hitbox>({
+            .layer = HitboxLayer::Enemies,
+            .interactsWith = HitboxLayer::Players,
+            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
+            .applies = {create_component<Destroy>({})}
+            });
+    enemy->add_component<Hp>({.hp = 10});
+
+    spawnPlayer();
 	// game loop
 	
 	auto keyb = resources->get_component<KeyBinds>();
@@ -133,15 +155,19 @@ int main ()
 			}
 
 			shoot(type);
-		   updateGravity(d);
-			updateVelocity(d);
-	      renderThings(d);
-   	   arrowMovement(d);
-  		   restrictToWorld(d);
-   	   destroyBeyondWorld();
-   	 	detectCollision();
-     		outlineColliders();
-			ammoCounter(type);
+	   updateGravity(d);
+		updateVelocity(d);
+      renderThings(d);
+      arrowMovement(d);
+      restrictToWorld(d);
+      destroyBeyondWorld();
+    	detectCollision();
+      outlineColliders();
+		ammoCounter(type);
+        displayhp();
+        damage();
+        die();
+        destroy();
 		} 
 		else if((Sett && !Menu) || (Sett && Pause)){ //Ustawienia
 			if(IsMusicStreamPlaying(musicRes->backgroundMusic)){
@@ -242,6 +268,20 @@ int main ()
 			if(CheckCollisionPointRec(mousePosition, {250, 300, 400, 30})){
 				DrawRectangle(250, 300, 400, 30, LIGHTGRAY);
 				if(!KeybindsBtt[2]) DrawText(GetKeyText(keyb->left), 300, 305, 25, BLACK);
+		if (IsKeyPressed(KEY_ONE)) type = 1;
+		if (IsKeyPressed(KEY_TWO)) type = 2;
+		if (IsKeyPressed(KEY_THREE)) type = 3;
+		
+		
+		DrawText("FPS:", 50,700,25,BLACK);
+		DrawText(std::to_string(GetFPS()).c_str(), 120,700,25,BLACK); 
+
+		
+
+        //std::cout << "Entities: " << entities->get().size() << "\n";
+		// end the frame and get ready for the next one  (display frame, poll input, etc...)
+		EndDrawing();
+	}
 
 				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 					KeybindsBtt[2] = true;

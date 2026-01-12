@@ -58,11 +58,29 @@ typedef struct {
     std::int32_t layer;
     std::int32_t interactsWith;
     Area collisionBox; // Cordinates are RELATIVE to entity owning that collisionBox, NOT absolute.
+    std::vector<ComponentHandle> receives;
     std::vector<ComponentHandle> applies;
 } Hitbox;
 void detectCollision();
 void outlineColliders();
 
+typedef struct {
+} Destroy;
+void destroy();
+
+typedef struct {
+    int hp;
+} Hp;
+typedef struct {
+    int dmg;
+} Damage;
+typedef struct {
+    bool global;
+    Vec2 vec;
+} HpOffset;
+void damage();
+void displayhp();
+void die();
 
 void ammoCounter(int type); //, int *ammoPointer);
 

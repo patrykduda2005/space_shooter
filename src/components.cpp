@@ -65,7 +65,8 @@ void shoot(int tab){//, int *ammoPointer) {
                         .layer = HitboxLayer::Bullets, 
                         .interactsWith = HitboxLayer::Enemies, 
                         .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
+                        .receives = {create_component<Destroy>({})},
+                        .applies = {create_component<Damage>({.dmg = 1})}
                         });
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -233,6 +234,9 @@ void detectCollision() {
                     Area globalColliderHitbox = colliderHitbox->collisionBox + Vec2(collider.pos->x, collider.pos->y);
                     Area globalCollideeHitbox = collideeHitbox->collisionBox + Vec2(collidee.pos->x, collidee.pos->y);
                     if (globalColliderHitbox.overlaps(globalCollideeHitbox) == false) continue; // Sprawdzenie czy sie kolliduja
+                    for (ComponentHandle component : colliderHitbox->receives) {
+                        collider.ent->add_component(component);
+                    }
                     for (ComponentHandle component : colliderHitbox->applies) {
                         collidee.ent->add_component(component);
                     }
@@ -252,6 +256,14 @@ void outlineColliders() {
             Area global_col = hitbox->collisionBox + Vec2(pos->x, pos->y);
             DrawRectangleLines(global_col.left_up_corner.x, global_col.left_up_corner.y, global_col.getWidth(), global_col.getHeight(), YELLOW);
         }
+    }
+}
+
+void destroy() {
+    for (Entity *ent : entities->get()) {
+        auto del = ent->get_component<Destroy>();
+        if (!del) continue;
+        entities->kill_entity(ent);
     }
 }
 
@@ -304,5 +316,42 @@ const char* GetKeyText(int key) {
 
         // Dla całej reszty używamy wbudowanej funkcji Rayliba
         default: return GetKeyName(key);
+    }
+}
+void displayhp() {
+    for (Entity* ent : entities->get()) {
+        auto pos = ent->get_component<Position>();
+        auto hp = ent->get_component<Hp>();
+        if (!pos || !hp) continue;
+        HpOffset *hpoffset;
+        char hpText[100];
+        std::snprintf(hpText, 100, "Hp: %d", hp->hp);
+        if ((hpoffset = ent->get_component<HpOffset>())) {
+            if (hpoffset->global)
+                DrawText(hpText,
+                        hpoffset->vec.x,
+                        hpoffset->vec.y, 25, RED);
+            else
+                DrawText(hpText,
+                        pos->x + hpoffset->vec.x,
+                        pos->y + hpoffset->vec.y, 25, RED);
+        } else
+            DrawText(hpText, pos->x, pos->y, 25, RED);
+    }
+}
+void damage() {
+    for (Entity* ent : entities->get()) {
+        auto dmg = ent->get_component<Damage>();
+        auto hp = ent->get_component<Hp>();
+        if (!dmg || !hp) continue;
+        hp->hp -= dmg->dmg;
+        ent->remove_component<Damage>();
+    }
+}
+
+void die() {
+    for (Entity* ent : entities->get()) {
+        auto hp = ent->get_component<Hp>();
+        if (hp && hp->hp <= 0) entities->kill_entity(ent);
     }
 }
