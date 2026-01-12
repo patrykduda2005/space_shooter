@@ -66,7 +66,7 @@ void shoot(int tab){//, int *ammoPointer) {
                         .interactsWith = HitboxLayer::Enemies, 
                         .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
                         .receives = {create_component<Destroy>({})},
-                        .applies = {create_component<Destroy>({})}
+                        .applies = {create_component<Damage>({.dmg = 1})}
                         });
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -262,4 +262,42 @@ void ammoCounter(int type){
 			DrawText("3x", 920,730,35,BLACK);
 		}
 
+}
+
+void displayhp() {
+    for (Entity* ent : entities->get()) {
+        auto pos = ent->get_component<Position>();
+        auto hp = ent->get_component<Hp>();
+        if (!pos || !hp) continue;
+        HpOffset *hpoffset;
+        char hpText[100];
+        std::snprintf(hpText, 100, "Hp: %d", hp->hp);
+        if ((hpoffset = ent->get_component<HpOffset>())) {
+            if (hpoffset->global)
+                DrawText(hpText,
+                        hpoffset->vec.x,
+                        hpoffset->vec.y, 25, RED);
+            else
+                DrawText(hpText,
+                        pos->x + hpoffset->vec.x,
+                        pos->y + hpoffset->vec.y, 25, RED);
+        } else
+            DrawText(hpText, pos->x, pos->y, 25, RED);
+    }
+}
+void damage() {
+    for (Entity* ent : entities->get()) {
+        auto dmg = ent->get_component<Damage>();
+        auto hp = ent->get_component<Hp>();
+        if (!dmg || !hp) continue;
+        hp->hp -= dmg->dmg;
+        ent->remove_component<Damage>();
+    }
+}
+
+void die() {
+    for (Entity* ent : entities->get()) {
+        auto hp = ent->get_component<Hp>();
+        if (hp && hp->hp <= 0) entities->kill_entity(ent);
+    }
 }

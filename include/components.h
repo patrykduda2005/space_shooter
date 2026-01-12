@@ -68,5 +68,18 @@ typedef struct {
 } Destroy;
 void destroy();
 
+typedef struct {
+    int hp;
+} Hp;
+typedef struct {
+    int dmg;
+} Damage;
+typedef struct {
+    bool global;
+    Vec2 vec;
+} HpOffset;
+void damage();
+void displayhp();
+void die();
 
 void ammoCounter(int type); //, int *ammoPointer);
