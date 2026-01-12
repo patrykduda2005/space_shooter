@@ -36,6 +36,19 @@ void spawnPlayer() {
             });
 }
 
+void spawnEnemy(Position pos) {
+    Entity* enemy = entities->new_entity();
+    enemy->add_component<Position>(pos);
+    enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+    enemy->add_component<Hitbox>({
+            .layer = HitboxLayer::Enemies,
+            .interactsWith = HitboxLayer::Players,
+            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
+            .applies = {create_component<Destroy>({})}
+            });
+    enemy->add_component<Hp>({.hp = 10});
+}
+
 bool Pause = true;
 bool Datalog = false;
 bool Sett = false;
@@ -82,27 +95,10 @@ int main ()
 
 	//WIELKI PIEC
 
-    Entity* enemy = entities->new_entity();
-    enemy->add_component<Position>({.x = 500, .y = 500});
-    enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    enemy->add_component<Hitbox>({
-            .layer = HitboxLayer::Enemies,
-            .interactsWith = HitboxLayer::Players,
-            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
-            .applies = {create_component<Destroy>({})}
-            });
-    enemy->add_component<Hp>({.hp = 10});
 
-    Entity* enemy2 = entities->new_entity();
-    enemy2->add_component<Position>({.x = 500, .y = 100});
-    enemy2->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    enemy2->add_component<Hitbox>({
-            .layer = HitboxLayer::Enemies,
-            .interactsWith = HitboxLayer::Players,
-            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
-            .applies = {create_component<Destroy>({})}
-            });
-    enemy2->add_component<Hp>({.hp = 10});
+    spawnEnemy({.x = 500, .y = 500});
+    spawnEnemy({.x = 500, .y = 100});
+    spawnEnemy({.x = 200, .y = 300});
 
     spawnPlayer();
 	// game loop
