@@ -52,8 +52,11 @@ enum HitboxLayer {
     Players = (1 << 31),
     Bullets = (1 << 30),
     Enemies = (1 << 29),
+    Effects = (1 << 28),
 };
 
+typedef struct {
+} RemoveHitbox;
 typedef struct {
     std::int32_t layer;
     std::int32_t interactsWith;
@@ -63,6 +66,7 @@ typedef struct {
 } Hitbox;
 void detectCollision();
 void outlineColliders();
+void removeHitbox();
 
 typedef struct {
 } Destroy;
@@ -85,3 +89,22 @@ void die();
 void ammoCounter(int type); //, int *ammoPointer);
 
 const char* GetKeyText(int key);
+
+typedef struct {
+    std::vector<Entity*> comps;
+} Spawn;
+void spawn();
+
+typedef struct {
+    std::vector<ComponentHandle> comps;
+    double timestamp;
+    double delay;
+} Delay;
+void delay();
+
+typedef struct {
+    int g;
+} BlackHole;
+typedef struct {
+} SuckedToBlack;
+void suckToBlack(float d);

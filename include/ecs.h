@@ -29,15 +29,15 @@ class Entity {
     std::vector<ComponentHandle> components;
     public:
     Entity() {};
-    void add_component(ComponentHandle);
+    Entity* add_component(ComponentHandle);
     template<typename T>
-    void add_component(T comp);
+    Entity* add_component(T comp);
     template<typename T>
     T* get_component();
     template<typename T>
     std::vector<T*> get_components();
     template<typename T>
-    void remove_component();
+    Entity* remove_component();
 };
 
 class Entities {
@@ -45,6 +45,7 @@ class Entities {
     public:
     Entities() {};
     Entity* new_entity();
+    void attach(Entity *ent);
     std::vector<Entity*> get();
     void kill_entity(Entity* ent);
 };
@@ -62,8 +63,9 @@ ComponentHandle create_component(T comp) {
 
 
 template<typename T>
-void Entity::add_component(T comp) {
+Entity* Entity::add_component(T comp) {
     this->components.push_back(create_component(comp));
+    return this;
 }
 
 template<typename T>
@@ -90,14 +92,16 @@ std::vector<T*> Entity::get_components() {
 }
 
 template<typename T>
-void Entity::remove_component() {
+Entity* Entity::remove_component() {
     comp_id_t comp_id = registry->_get_id(typeid(T).name());
     for (int i = 0; i < this->components.size(); i++) {
         if (this->components[i].id == comp_id) {
             ComponentHandle last_comp = this->components[this->components.size() - 1];
             this->components[i] = last_comp;
             this->components.pop_back();
+            return this;
         }
     }
+    return this;
 }
 

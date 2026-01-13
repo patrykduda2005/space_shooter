@@ -14,27 +14,8 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "components.h"
 #include "resources.h"
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
+#include "customentities.h"
 
-void spawnPlayer() {
-    Vec2 textureSize = Vec2(66, 120);
-    Area size = Area(textureSize * -0.5, textureSize * 0.5);
-
-    Entity* rabbit = entities->new_entity();
-    rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    rabbit->add_component<Position>({.x = 500, .y = 700});
-    rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
-    rabbit->add_component<RestrictToWorld>({});	
-	rabbit->add_component<Shooting>({.cooldown = 0.0});
-    rabbit->add_component<Hitbox>({
-            .layer = HitboxLayer::Players,
-            .collisionBox = size,
-            });
-    rabbit->add_component<Hp>({.hp = 10});
-    rabbit->add_component<HpOffset>({
-            .global = false,
-            .vec = size.left_up_corner - Vec2(0, 25),
-            });
-}
 
 bool Pause = true;
 bool Datalog = false;
@@ -82,16 +63,11 @@ int main ()
 
 	//WIELKI PIEC
 
-    Entity* enemy = entities->new_entity();
-    enemy->add_component<Position>({.x = 500, .y = 100});
-    enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-    enemy->add_component<Hitbox>({
-            .layer = HitboxLayer::Enemies,
-            .interactsWith = HitboxLayer::Players,
-            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
-            .applies = {create_component<Destroy>({})}
-            });
-    enemy->add_component<Hp>({.hp = 10});
+
+    spawnEnemy({.x = 500, .y = 500});
+    spawnEnemy({.x = 500, .y = 100});
+    spawnEnemy({.x = 200, .y = 300});
+    spawnEnemy({.x = 300, .y = 300});
 
     spawnPlayer();
 	// game loop
@@ -154,6 +130,11 @@ int main ()
 			
 			}
 
+        removeHitbox();
+    	detectCollision();
+        suckToBlack(d);
+            delay();
+            spawn();
 		shoot(type);
 	   updateGravity(d);
 		updateVelocity(d);
@@ -161,7 +142,6 @@ int main ()
       arrowMovement(d);
       restrictToWorld(d);
       destroyBeyondWorld();
-    	detectCollision();
       outlineColliders();
 		ammoCounter(type);
         displayhp();

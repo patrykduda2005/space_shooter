@@ -2,9 +2,11 @@
 #include "ecs.h"
 #include "raylib.h"
 #include "resources.h"
+#include "customentities.h"
 #include <cmath>
 #include <string>
 #include <iostream>
+
 
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
@@ -23,8 +25,15 @@ void updateVelocity(float d){
         auto vel = ent->get_component<Velocity>();
         auto pos = ent->get_component<Position>();
         if(pos && vel){
+            float maxSpeed = 1500;
             pos->x += vel->x * d;
-            //pos->y += vel->y * d;
+            pos->y += vel->y * d;
+            float speed = vel->x * vel->x + vel->y * vel->y;
+            if (speed > maxSpeed*maxSpeed) {
+                float scalar = maxSpeed*maxSpeed / speed;
+                vel->x *= scalar;
+                vel->y *= scalar;
+            }
         }
     }
 }
@@ -39,6 +48,7 @@ void renderThings(float d) {
         }
     }
 }
+
 
 void shoot(int tab){//, int *ammoPointer) {
     auto keyb = resources->get_component<KeyBinds>();
@@ -55,19 +65,7 @@ void shoot(int tab){//, int *ammoPointer) {
             if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
                 PlaySound(res->shootingsfx);
-
-                Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = res->bull});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet->add_component<Gravity>({.g = -700.0});
-                bullet->add_component<DestroyBeyondWorld>({});
-                bullet->add_component<Hitbox>({
-                        .layer = HitboxLayer::Bullets, 
-                        .interactsWith = HitboxLayer::Enemies, 
-                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .receives = {create_component<Destroy>({})},
-                        .applies = {create_component<Damage>({.dmg = 1})}
-                        });
+                entities->attach(shatterBullet(*pos));
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
@@ -75,45 +73,20 @@ void shoot(int tab){//, int *ammoPointer) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
-                Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = res->bull});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet->add_component<Gravity>({.g = -500.0});
-                bullet->add_component<DestroyBeyondWorld>({});
-                bullet->add_component<Hitbox>({
-                        .layer = HitboxLayer::Bullets, 
-                        .interactsWith = HitboxLayer::Enemies, 
-                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
-                        });
+                entities->attach(blackBullet(*pos));
+#if 0
+                entities->attach(basicBullet(*pos));
               
                 // Create a second bullet entity
-                Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = res->bull});
-                bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet2->add_component<Velocity>({.x = 150});
-                bullet2->add_component<Gravity>({.g = -500.0});
-                bullet2->add_component<DestroyBeyondWorld>({});
-                bullet2->add_component<Hitbox>({
-                        .layer = HitboxLayer::Bullets, 
-                        .interactsWith = HitboxLayer::Enemies, 
-                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
-                        });
+                Entity* bullet2 = basicBullet(*pos);
+                bullet2->get_component<Velocity>()->x = 150;
+                entities->attach(bullet2);
                 
                 // Create a third bullet entity
-                Entity* bullet3 = entities->new_entity();
-                bullet3->add_component<Render>({.txt = res->bull});
-                bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet3->add_component<Velocity>({.x = -150});
-                bullet3->add_component<Gravity>({.g = -500.0});
-                bullet3->add_component<DestroyBeyondWorld>({});
-                bullet3->add_component<Hitbox>({
-                        .layer = HitboxLayer::Bullets, 
-                        .interactsWith = HitboxLayer::Enemies, 
-                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
-                        });
+                Entity* bullet3 = basicBullet(*pos);
+                bullet3->get_component<Velocity>()->x = -150;
+                entities->attach(bullet3);
+#endif
                 
                 if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -122,37 +95,21 @@ void shoot(int tab){//, int *ammoPointer) {
             else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
-                
-                Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = res->bull});
-                bullet->add_component<Velocity>({.x = -100});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet->add_component<Gravity>({.g = -600.0});
-                bullet->add_component<DestroyBeyondWorld>({});
-                bullet->add_component<Hitbox>({
-                        .layer = HitboxLayer::Bullets, 
-                        .interactsWith = HitboxLayer::Enemies, 
-                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
-                        });
+
+                entities->attach(basicBullet(*pos));
+#if 0                
+                Entity* bullet = basicBullet(*pos);
+                bullet->get_component<Velocity>()->x = -100;
+                entities->attach(bullet);
               
                 // Create a second bullet entity
-                Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = res->bull});
-                bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet2->add_component<Velocity>({.x = 100});
-                bullet2->add_component<Gravity>({.g = -600.0});
-                bullet2->add_component<DestroyBeyondWorld>({});
-                bullet2->add_component<Hitbox>({
-                        .layer = HitboxLayer::Bullets, 
-                        .interactsWith = HitboxLayer::Enemies, 
-                        .collisionBox = Area(Vec2(0,0), Vec2(100,200)), 
-                        .applies = {create_component<Gravity>({.g = 100})}
-                        });
+                Entity* bullet2 = basicBullet(*pos);
+                bullet2->get_component<Velocity>()->x = 100;
+                entities->attach(bullet2);
+#endif
              
                 if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
-
             }
         }
     }
@@ -245,6 +202,14 @@ void detectCollision() {
         }
     }
 
+}
+
+void removeHitbox() {
+    for (Entity *ent : entities->get()) {
+        auto removeHitbox = ent->get_component<RemoveHitbox>();
+        if (!removeHitbox) continue;
+        ent->remove_component<Hitbox>();
+    }
 }
 
 void outlineColliders() {
@@ -355,3 +320,63 @@ const char* GetKeyText(int key) {
         default: return GetKeyName(key);
     }
 }
+
+void spawn() {
+    for (Entity* ent : entities->get()) {
+        auto spawn = ent->get_component<Spawn>();
+        if (!spawn) continue;
+        for (Entity* spawned : spawn->comps) {
+            Position* hostPos;
+            Delay* delay;
+            if ((hostPos = ent->get_component<Position>()))
+                *spawned->get_component<Position>() = *hostPos;
+            if ((delay = spawned->get_component<Delay>())) {
+                delay->timestamp = GetTime();
+                //spawned->add_component<Delay>(*delay);
+            }
+            entities->attach(spawned);
+        }
+        ent->remove_component<Spawn>();
+    }
+}
+
+void delay() {
+    for (Entity* ent : entities->get()) {
+        auto delays = ent->get_components<Delay>();
+        if (delays.empty()) continue;
+        for (Delay* delay : delays) {
+            if ((GetTime() - delay->timestamp) > delay->delay) {
+                for (ComponentHandle comp : delay->comps) {
+                    if (registry->_get_id(typeid(Delay).name()) == comp.id)
+                        (*(Delay*)(comp.comp)).timestamp = GetTime(); //Oh man ten system..
+                    ent->add_component(comp);
+                }
+                ent->remove_component<Delay>();
+            }
+        }
+    }
+}
+
+void suckToBlack(float d) {
+    for (Entity* ent : entities->get()) {
+        auto black = ent->get_component<BlackHole>();
+        auto pos = ent->get_component<Position>();
+        if (!black || !pos) continue;
+        for (Entity* suckee : entities->get()) {
+            if (suckee == ent || !suckee->get_component<SuckedToBlack>()) continue;
+            auto suckeeVel = suckee->get_component<Velocity>();
+            auto suckeePos = suckee->get_component<Position>();
+            auto suckeeblack = suckee->get_component<BlackHole>();
+            auto suckeeArrow = suckee->get_component<ArrowMovement>();
+            if (!suckeePos || !suckeeVel || suckeeblack || suckeeArrow) continue;
+            // F = (G * m1 * m2) / (r^2) powiedzmy ze g = m1, a m2 jest stala
+            Vec2 dystans = Vec2(pos->x - suckeePos->x, pos->y - suckeePos->y);
+            if (dystans.x * dystans.x + dystans.y * dystans.y > 300*300) continue;
+            if (dystans.x != 0)
+                suckeeVel->x += ((dystans.x / std::abs(dystans.x)) * d * black->g * 0.01)/dystans.x * dystans.x;
+            if (dystans.y != 0)
+                suckeeVel->y += ((dystans.y / std::abs(dystans.y)) * d * black->g * 0.01)/dystans.y * dystans.y;
+        }
+    }
+}
+
