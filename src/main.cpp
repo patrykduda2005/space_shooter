@@ -47,6 +47,7 @@ void spawnEnemy(Position pos) {
             .applies = {create_component<Destroy>({})}
             });
     enemy->add_component<Hp>({.hp = 10});
+    enemy->add_component<Velocity>({.x = 0, .y = 0});
 }
 
 bool Pause = true;
@@ -99,6 +100,7 @@ int main ()
     spawnEnemy({.x = 500, .y = 500});
     spawnEnemy({.x = 500, .y = 100});
     spawnEnemy({.x = 200, .y = 300});
+    spawnEnemy({.x = 300, .y = 300});
 
     spawnPlayer();
 	// game loop
@@ -161,6 +163,7 @@ int main ()
 			
 			}
 
+        removeHitbox();
     	detectCollision();
         suckToBlack(d);
             delay();

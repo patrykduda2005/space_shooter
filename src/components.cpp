@@ -6,6 +6,8 @@
 #include <string>
 #include <iostream>
 
+Entity* boom(Position pos);
+
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
@@ -23,8 +25,15 @@ void updateVelocity(float d){
         auto vel = ent->get_component<Velocity>();
         auto pos = ent->get_component<Position>();
         if(pos && vel){
+            float maxSpeed = 1500;
             pos->x += vel->x * d;
-            //pos->y += vel->y * d;
+            pos->y += vel->y * d;
+            float speed = vel->x * vel->x + vel->y * vel->y;
+            if (speed > maxSpeed*maxSpeed) {
+                float scalar = maxSpeed*maxSpeed / speed;
+                vel->x *= scalar;
+                vel->y *= scalar;
+            }
         }
     }
 }
@@ -49,7 +58,7 @@ Entity* basicBullet(Position pos) {
     Entity* bullet = new Entity();
     bullet->add_component<Render>({.txt = res->bull});
     bullet->add_component<Position>({.x = pos.x, .y = pos.y-45});
-    bullet->add_component<Gravity>({.g = -700.0});
+    //bullet->add_component<Gravity>({.g = -700.0});
     bullet->add_component<DestroyBeyondWorld>({});
     bullet->add_component<Hitbox>({
             .layer = HitboxLayer::Bullets, 
@@ -58,14 +67,20 @@ Entity* basicBullet(Position pos) {
             .receives = {create_component<Destroy>({})},
             .applies = {create_component<Damage>({.dmg = 1})}
             });
+    bullet->add_component<SuckedToBlack>({});
+    bullet->add_component<Velocity>({.x = 0, .y = -700});
     return bullet;
 }
 
 Entity* sniperBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
-    bullet->get_component<Gravity>()->g *= 2;
+    bullet->get_component<Render>()->txt = LoadTexture("surowka-boom.png");
+    bullet->get_component<Velocity>()->y *= 2;
     Hitbox* hitbox = bullet->get_component<Hitbox>();
-    hitbox->applies = {create_component<Damage>({.dmg = 3})};
+    hitbox->applies = {};
+    hitbox->receives.push_back(create_component<Spawn>({
+                .comps = {boom(pos)}
+                }));
     return bullet;
 }
 
@@ -81,12 +96,13 @@ Entity* shatteredBullet(Position pos, Hitbox* hitbox) {
 
 Entity* shatterBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
+    bullet->get_component<Render>()->txt = LoadTexture("surowka-shattering.png");
     Hitbox* hitbox = bullet->get_component<Hitbox>();
     Entity* bullet2 = shatteredBullet(pos, hitbox);
-    bullet2->add_component<Velocity>({.x = 500});
+    bullet2->get_component<Velocity>()->x = 500;
     Entity* bullet3 = shatteredBullet(pos, hitbox);
     Entity* bullet4 = shatteredBullet(pos, hitbox);
-    bullet4->add_component<Velocity>({.x = -500});
+    bullet4->get_component<Velocity>()->x = -500;
 
     hitbox->receives.push_back(create_component<Spawn>({.comps = {
                 bullet2,
@@ -98,19 +114,44 @@ Entity* shatterBullet(Position pos) {
 
 Entity* blackBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
-    bullet->get_component<Gravity>()->g = -100;
+    bullet->get_component<Render>()->txt = LoadTexture("surowka-black.png");
+    bullet->get_component<Velocity>()->y = -100;
     bullet->remove_component<Hitbox>();
-    bullet->add_component<Delay>({
+    ComponentHandle die = create_component<Delay>({
             .comps = {create_component<Destroy>({})},
-            .timestamp = GetTime(),
-            .delay = 3,
+            .delay = 4,
             });
     bullet->add_component<Delay>({
-            .comps = {create_component<BlackHole>({.g = 100})},
+            .comps = {create_component<BlackHole>({.g = 2 * 300000}), die},
             .timestamp = GetTime(),
             .delay = 1,
             });
+    bullet->remove_component<SuckedToBlack>();
     return bullet;
+}
+
+Entity* boom(Position pos) {
+    Entity* boom = new Entity();
+    Texture2D txt = LoadTexture("boom.png");
+    boom->add_component<Render>({.txt = txt});
+    Area hitboxSize = Area(
+            Vec2(txt.width, txt.height) * -0.5,
+            Vec2(txt.width, txt.height) * 0.5
+            );
+    boom->add_component<Position>(pos);
+    boom->add_component<Delay>({
+            .comps = {create_component<Destroy>({})},
+            .timestamp = GetTime(),
+            .delay = 0.1,
+            });
+    boom->add_component<Hitbox>({
+            .layer = HitboxLayer::Effects,
+            .interactsWith = HitboxLayer::Enemies,
+            .collisionBox = hitboxSize,
+            .receives = {create_component<RemoveHitbox>({})},
+            .applies = {create_component<Damage>({.dmg = 3})},
+            });
+    return boom;
 }
 
 void shoot(int tab){//, int *ammoPointer) {
@@ -128,7 +169,7 @@ void shoot(int tab){//, int *ammoPointer) {
             if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
                 PlaySound(res->shootingsfx);
-                entities->attach(blackBullet(*pos));
+                entities->attach(shatterBullet(*pos));
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
@@ -136,17 +177,20 @@ void shoot(int tab){//, int *ammoPointer) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
+                entities->attach(blackBullet(*pos));
+#if 0
                 entities->attach(basicBullet(*pos));
               
                 // Create a second bullet entity
                 Entity* bullet2 = basicBullet(*pos);
-                bullet2->add_component<Velocity>({.x = 150});
+                bullet2->get_component<Velocity>()->x = 150;
                 entities->attach(bullet2);
                 
                 // Create a third bullet entity
                 Entity* bullet3 = basicBullet(*pos);
-                bullet3->add_component<Velocity>({.x = -150});
+                bullet3->get_component<Velocity>()->x = -150;
                 entities->attach(bullet3);
+#endif
                 
                 if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -155,15 +199,18 @@ void shoot(int tab){//, int *ammoPointer) {
             else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
-                
+
+                entities->attach(basicBullet(*pos));
+#if 0                
                 Entity* bullet = basicBullet(*pos);
-                bullet->add_component<Velocity>({.x = -100});
+                bullet->get_component<Velocity>()->x = -100;
                 entities->attach(bullet);
               
                 // Create a second bullet entity
                 Entity* bullet2 = basicBullet(*pos);
-                bullet2->add_component<Velocity>({.x = 100});
+                bullet2->get_component<Velocity>()->x = 100;
                 entities->attach(bullet2);
+#endif
              
                 if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
@@ -259,6 +306,14 @@ void detectCollision() {
         }
     }
 
+}
+
+void removeHitbox() {
+    for (Entity *ent : entities->get()) {
+        auto removeHitbox = ent->get_component<RemoveHitbox>();
+        if (!removeHitbox) continue;
+        ent->remove_component<Hitbox>();
+    }
 }
 
 void outlineColliders() {
@@ -396,6 +451,8 @@ void delay() {
         for (Delay* delay : delays) {
             if ((GetTime() - delay->timestamp) > delay->delay) {
                 for (ComponentHandle comp : delay->comps) {
+                    if (registry->_get_id(typeid(Delay).name()) == comp.id)
+                        (*(Delay*)(comp.comp)).timestamp = GetTime(); //Oh man ten system..
                     ent->add_component(comp);
                 }
                 ent->remove_component<Delay>();
@@ -410,14 +467,20 @@ void suckToBlack(float d) {
         auto pos = ent->get_component<Position>();
         if (!black || !pos) continue;
         for (Entity* suckee : entities->get()) {
-            if (suckee == ent) continue;
+            if (suckee == ent || !suckee->get_component<SuckedToBlack>()) continue;
+            auto suckeeVel = suckee->get_component<Velocity>();
             auto suckeePos = suckee->get_component<Position>();
             auto suckeeblack = suckee->get_component<BlackHole>();
             auto suckeeArrow = suckee->get_component<ArrowMovement>();
-            if (!suckeePos || suckeeblack || suckeeArrow) continue;
-            std::cout << "siema" << "\n";
-            suckeePos->x += ((pos->x - suckeePos->x) * d * black->g)/(std::abs(pos->x - suckeePos->x));
-            suckeePos->y += ((pos->y - suckeePos->y) * d * black->g)/(std::abs(pos->y - suckeePos->y));
+            if (!suckeePos || !suckeeVel || suckeeblack || suckeeArrow) continue;
+            // F = (G * m1 * m2) / (r^2) powiedzmy ze g = m1, a m2 jest stala
+            Vec2 dystans = Vec2(pos->x - suckeePos->x, pos->y - suckeePos->y);
+            if (dystans.x * dystans.x + dystans.y * dystans.y > 300*300) continue;
+            if (dystans.x != 0)
+                suckeeVel->x += ((dystans.x / std::abs(dystans.x)) * d * black->g * 0.01)/dystans.x * dystans.x;
+            if (dystans.y != 0)
+                suckeeVel->y += ((dystans.y / std::abs(dystans.y)) * d * black->g * 0.01)/dystans.y * dystans.y;
         }
     }
 }
+
