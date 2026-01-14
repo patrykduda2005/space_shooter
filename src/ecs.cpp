@@ -19,13 +19,19 @@ comp_id_t _Registry::_get_id(const char* name) {
     }
 }
 
+Entity* Entity::add_component(ComponentHandle handle) {
+    this->components.push_back(handle);
+    return this;
+}
+
 Entity* Entities::new_entity() {
     Entity* ent = new Entity();
     this->ents.push_back(ent);
     return ent;
 }
-
-
+void Entities::attach(Entity *ent) {
+    this->ents.push_back(ent);
+}
 
 std::vector<Entity*> Entities::get() {
     return this->ents;

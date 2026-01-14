@@ -1,7 +1,12 @@
 #include "components.h"
 #include "ecs.h"
+#include "raylib.h"
 #include "resources.h"
+#include "customentities.h"
 #include <cmath>
+#include <string>
+#include <iostream>
+
 
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
@@ -20,8 +25,15 @@ void updateVelocity(float d){
         auto vel = ent->get_component<Velocity>();
         auto pos = ent->get_component<Position>();
         if(pos && vel){
+            float maxSpeed = 1500;
             pos->x += vel->x * d;
-            //pos->y += vel->y * d;
+            pos->y += vel->y * d;
+            float speed = vel->x * vel->x + vel->y * vel->y;
+            if (speed > maxSpeed*maxSpeed) {
+                float scalar = maxSpeed*maxSpeed / speed;
+                vel->x *= scalar;
+                vel->y *= scalar;
+            }
         }
     }
 }
@@ -37,72 +49,67 @@ void renderThings(float d) {
     }
 }
 
-void shoot(int tab) {
+
+void shoot(int tab){//, int *ammoPointer) {
+    auto keyb = resources->get_component<KeyBinds>();
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
         auto pos = ent->get_component<Position>();
         auto shootComp = ent->get_component<Shooting>();
         auto vel = ent->get_component<Velocity>();
+        auto res = resources->get_component<soundTextureResources>();   
+        auto ammoComp = resources->get_component<AmmoCounter>();
+
         if (pos && shootComp) {
             if (shootComp->cooldown > 0) shootComp->cooldown -= GetFrameTime();
-            if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 &&tab == 1) {
+            if (IsKeyDown(keyb->shoot) && shootComp->cooldown <= 0 && tab == 1) {
                 // Create a new bullet entity
-                Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet->add_component<Gravity>({.g = -700.0});
-                bullet->add_component<DestroyBeyondWorld>({});
-              //  cout << "Shooting!\n";
+                PlaySound(res->shootingsfx);
+                entities->attach(shatterBullet(*pos));
+                //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
-
             }
-            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
-                Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet->add_component<Gravity>({.g = -500.0});
-                bullet->add_component<DestroyBeyondWorld>({});
+                PlaySound(res->shootingsfx);
+
+                entities->attach(blackBullet(*pos));
+#if 0
+                entities->attach(basicBullet(*pos));
               
                 // Create a second bullet entity
-                Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet2->add_component<Velocity>({.x = 150});
-                bullet2->add_component<Gravity>({.g = -500.0});
-                bullet2->add_component<DestroyBeyondWorld>({});
+                Entity* bullet2 = basicBullet(*pos);
+                bullet2->get_component<Velocity>()->x = 150;
+                entities->attach(bullet2);
                 
                 // Create a third bullet entity
-                Entity* bullet3 = entities->new_entity();
-                bullet3->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet3->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet3->add_component<Velocity>({.x = -150});
-                bullet3->add_component<Gravity>({.g = -500.0});
-                bullet3->add_component<DestroyBeyondWorld>({});
+                Entity* bullet3 = basicBullet(*pos);
+                bullet3->get_component<Velocity>()->x = -150;
+                entities->attach(bullet3);
+#endif
                 
-
+                if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (KEY_SPACE) && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
-                Entity* bullet = entities->new_entity();
-                bullet->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet->add_component<Velocity>({.x = -100});
-                bullet->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet->add_component<Gravity>({.g = -600.0});
-                bullet->add_component<DestroyBeyondWorld>({});
+                PlaySound(res->shootingsfx);
+
+                entities->attach(basicBullet(*pos));
+#if 0                
+                Entity* bullet = basicBullet(*pos);
+                bullet->get_component<Velocity>()->x = -100;
+                entities->attach(bullet);
               
                 // Create a second bullet entity
-                Entity* bullet2 = entities->new_entity();
-                bullet2->add_component<Render>({.txt = LoadTexture("surowka.png")});
-                bullet2->add_component<Position>({.x = pos->x, .y = pos->y-45});
-                bullet2->add_component<Velocity>({.x = 100});
-                bullet2->add_component<Gravity>({.g = -600.0});
-                bullet2->add_component<DestroyBeyondWorld>({});
+                Entity* bullet2 = basicBullet(*pos);
+                bullet2->get_component<Velocity>()->x = 100;
+                entities->attach(bullet2);
+#endif
              
+                if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
-
             }
         }
     }
@@ -113,11 +120,12 @@ void arrowMovement(float d) {
         auto ent = entities->get()[i];
         auto arr = ent->get_component<ArrowMovement>();
         auto pos = ent->get_component<Position>();
+        auto keyb = resources->get_component<KeyBinds>();
         if (arr && pos) {
-            if (IsKeyDown(KEY_RIGHT)) pos->x += arr->eastSpeed * d;
-            if (IsKeyDown(KEY_LEFT)) pos->x -= arr->westSpeed * d;
-            if (IsKeyDown(KEY_UP)) pos->y -= arr->northSpeed * d;
-            if (IsKeyDown(KEY_DOWN)) pos->y += arr->southSpeed * d; 
+            if (IsKeyDown(keyb->right)) pos->x += arr->eastSpeed * d;
+            if (IsKeyDown(keyb->left)) pos->x -= arr->westSpeed * d;
+            if (IsKeyDown(keyb->up)) pos->y -= arr->northSpeed * d;
+            if (IsKeyDown(keyb->down)) pos->y += arr->southSpeed * d; 
         }
     }
 }
@@ -152,3 +160,223 @@ void destroyBeyondWorld() {
         }
     }
 }
+
+// O brachu..
+typedef struct {
+    Entity *ent;
+    std::vector<Hitbox *> hitboxes;
+    Position *pos;
+} CollideCandidate;
+
+void detectCollision() {
+    // Szuka entity z pozycja i hitboxem
+    std::vector<CollideCandidate> colliders;
+    std::vector<CollideCandidate> collidees;
+    for (Entity *collider : entities->get()) {
+        CollideCandidate candidate = {.ent = collider};
+        candidate.hitboxes = collider->get_components<Hitbox>();
+        candidate.pos = collider->get_component<Position>();
+        if (!candidate.pos || candidate.hitboxes.empty()) continue; 
+        colliders.push_back(candidate);
+        collidees.push_back(candidate);
+    }
+
+    // Szukamy teraz czy cos ze soba kolliduje
+    for (CollideCandidate collider : colliders) {
+        for (CollideCandidate collidee : collidees) {
+            if (collider.ent == collidee.ent) continue;
+            for (Hitbox *colliderHitbox : collider.hitboxes) {
+                for (Hitbox *collideeHitbox : collidee.hitboxes) {
+                    if ((colliderHitbox->interactsWith & collideeHitbox->layer) == 0) continue; // Sprawdzenie layerow
+                    Area globalColliderHitbox = colliderHitbox->collisionBox + Vec2(collider.pos->x, collider.pos->y);
+                    Area globalCollideeHitbox = collideeHitbox->collisionBox + Vec2(collidee.pos->x, collidee.pos->y);
+                    if (globalColliderHitbox.overlaps(globalCollideeHitbox) == false) continue; // Sprawdzenie czy sie kolliduja
+                    for (ComponentHandle component : colliderHitbox->receives) {
+                        collider.ent->add_component(component);
+                    }
+                    for (ComponentHandle component : colliderHitbox->applies) {
+                        collidee.ent->add_component(component);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void removeHitbox() {
+    for (Entity *ent : entities->get()) {
+        auto removeHitbox = ent->get_component<RemoveHitbox>();
+        if (!removeHitbox) continue;
+        ent->remove_component<Hitbox>();
+    }
+}
+
+void outlineColliders() {
+    for (Entity *ent : entities->get()) {
+        auto col = ent->get_components<Hitbox>();
+        auto pos = ent->get_component<Position>();
+        if (!pos || col.empty()) continue;
+        for (Hitbox *hitbox : col) {
+            Area global_col = hitbox->collisionBox + Vec2(pos->x, pos->y);
+            DrawRectangleLines(global_col.left_up_corner.x, global_col.left_up_corner.y, global_col.getWidth(), global_col.getHeight(), YELLOW);
+        }
+    }
+}
+
+void destroy() {
+    for (Entity *ent : entities->get()) {
+        auto del = ent->get_component<Destroy>();
+        if (!del) continue;
+        entities->kill_entity(ent);
+    }
+}
+
+void ammoCounter(int type){ 
+    auto ammoComp = resources->get_component<AmmoCounter>();
+    
+    if(type == 1){
+			DrawText("o", 875,675,35,WHITE);
+			DrawText("o", 885,675,35,WHITE);
+			DrawText("1x", 920,675,35,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
+		}
+		else if(type == 2){ 
+			DrawText("o", 875,675,25,WHITE);
+			DrawText("o", 885,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,WHITE);
+			DrawText("2x", 920,700,35,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
+		}
+		else if(type == 3){ 
+			DrawText("o", 875,675,25,WHITE);
+			DrawText("o", 885,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,WHITE);
+			DrawText("3x", 920,730,35,WHITE);
+		}
+
+}
+
+void displayhp() {
+    for (Entity* ent : entities->get()) {
+        auto pos = ent->get_component<Position>();
+        auto hp = ent->get_component<Hp>();
+        if (!pos || !hp) continue;
+        HpOffset *hpoffset;
+        char hpText[100];
+        std::snprintf(hpText, 100, "Hp: %d", hp->hp);
+        if ((hpoffset = ent->get_component<HpOffset>())) {
+            if (hpoffset->global)
+                DrawText(hpText,
+                        hpoffset->vec.x,
+                        hpoffset->vec.y, 25, RED);
+            else
+                DrawText(hpText,
+                        pos->x + hpoffset->vec.x,
+                        pos->y + hpoffset->vec.y, 25, RED);
+        } else
+            DrawText(hpText, pos->x, pos->y, 25, RED);
+    }
+}
+void damage() {
+    for (Entity* ent : entities->get()) {
+        auto dmg = ent->get_component<Damage>();
+        auto hp = ent->get_component<Hp>();
+        if (!dmg || !hp) continue;
+        hp->hp -= dmg->dmg;
+        ent->remove_component<Damage>();
+    }
+}
+
+void die() {
+    for (Entity* ent : entities->get()) {
+        auto hp = ent->get_component<Hp>();
+        if (hp && hp->hp <= 0) entities->kill_entity(ent);
+    }
+}
+
+const char* GetKeyText(int key) {
+    switch (key) {
+        // Ręczna obsługa klawiszy, których Raylib nie wyświetla poprawnie
+        case KEY_SPACE:         return "SPACE";
+        case KEY_LEFT_SHIFT:    return "L-SHIFT";
+        case KEY_RIGHT_SHIFT:   return "R-SHIFT";
+        case KEY_LEFT_CONTROL:  return "L-CTRL";
+        case KEY_RIGHT_CONTROL: return "R-CTRL";
+        case KEY_LEFT_ALT:      return "L-ALT";
+        case KEY_TAB:           return "TAB";
+        case KEY_ENTER:         return "ENTER";
+        case KEY_BACKSPACE:     return "BACK";
+        
+        // Strzałki (często też są puste w standardowym GetKeyName)
+        case KEY_UP:    return "UP";
+        case KEY_DOWN:  return "DOWN";
+        case KEY_LEFT:  return "LEFT";
+        case KEY_RIGHT: return "RIGHT";
+
+        // Dla całej reszty używamy wbudowanej funkcji Rayliba
+        default: return GetKeyName(key);
+    }
+}
+
+void spawn() {
+    for (Entity* ent : entities->get()) {
+        auto spawn = ent->get_component<Spawn>();
+        if (!spawn) continue;
+        for (Entity* spawned : spawn->comps) {
+            Position* hostPos;
+            Delay* delay;
+            if ((hostPos = ent->get_component<Position>()))
+                *spawned->get_component<Position>() = *hostPos;
+            if ((delay = spawned->get_component<Delay>())) {
+                delay->timestamp = GetTime();
+                //spawned->add_component<Delay>(*delay);
+            }
+            entities->attach(spawned);
+        }
+        ent->remove_component<Spawn>();
+    }
+}
+
+void delay() {
+    for (Entity* ent : entities->get()) {
+        auto delays = ent->get_components<Delay>();
+        if (delays.empty()) continue;
+        for (Delay* delay : delays) {
+            if ((GetTime() - delay->timestamp) > delay->delay) {
+                for (ComponentHandle comp : delay->comps) {
+                    if (registry->_get_id(typeid(Delay).name()) == comp.id)
+                        (*(Delay*)(comp.comp)).timestamp = GetTime(); //Oh man ten system..
+                    ent->add_component(comp);
+                }
+                ent->remove_component<Delay>();
+            }
+        }
+    }
+}
+
+void suckToBlack(float d) {
+    for (Entity* ent : entities->get()) {
+        auto black = ent->get_component<BlackHole>();
+        auto pos = ent->get_component<Position>();
+        if (!black || !pos) continue;
+        for (Entity* suckee : entities->get()) {
+            if (suckee == ent || !suckee->get_component<SuckedToBlack>()) continue;
+            auto suckeeVel = suckee->get_component<Velocity>();
+            auto suckeePos = suckee->get_component<Position>();
+            auto suckeeblack = suckee->get_component<BlackHole>();
+            auto suckeeArrow = suckee->get_component<ArrowMovement>();
+            if (!suckeePos || !suckeeVel || suckeeblack || suckeeArrow) continue;
+            // F = (G * m1 * m2) / (r^2) powiedzmy ze g = m1, a m2 jest stala
+            Vec2 dystans = Vec2(pos->x - suckeePos->x, pos->y - suckeePos->y);
+            if (dystans.x * dystans.x + dystans.y * dystans.y > 300*300) continue;
+            if (dystans.x != 0)
+                suckeeVel->x += ((dystans.x / std::abs(dystans.x)) * d * black->g * 0.01)/dystans.x * dystans.x;
+            if (dystans.y != 0)
+                suckeeVel->y += ((dystans.y / std::abs(dystans.y)) * d * black->g * 0.01)/dystans.y * dystans.y;
+        }
+    }
+}
+
