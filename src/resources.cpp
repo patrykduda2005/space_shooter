@@ -69,3 +69,11 @@ void initMusicResources(){
     });
 }
 
+void initSettingsComponent(){
+    resources->add_component<SettingsComponent>({
+        .fps_index = 1,
+        .volume = 0.5f,
+        .sfx_volume = 0.5f,
+    });
+}
+

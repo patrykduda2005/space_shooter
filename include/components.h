@@ -108,3 +108,6 @@ typedef struct {
 typedef struct {
 } SuckedToBlack;
 void suckToBlack(float d);
+
+
+void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt);

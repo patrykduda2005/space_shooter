@@ -55,4 +55,11 @@ typedef struct{
 } MusicResources;
 void initMusicResources();
 
+typedef struct {
+    int fps_index;// = 1;
+	float volume; // = 0.5f;
+	float sfx_volume; // = 0.5f;
+} SettingsComponent;
+void initSettingsComponent();
+
 extern Entity *resources;
