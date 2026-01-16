@@ -1,12 +1,3 @@
-/*
-Raylib example file.
-This is an example main file for a simple raylib project.
-Use this as a starting point or replace it with your code.
-
-by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit https://creativecommons.org/publicdomain/zero/1.0/
-
-*/
-
 #include <iostream>
 #include <string>
 #include "raylib.h"
@@ -17,12 +8,12 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 #include "customentities.h"
 
 
-bool Pause = true;
+bool Pause = false;
 bool Datalog = false;
 bool Sett = false;
 bool KeybindsBtt[8] = {false};
 bool Menu = true;
-bool menuANDsett = false;
+//bool menuANDsett = false;
 
 int main ()
 {
@@ -31,14 +22,7 @@ int main ()
 	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
 
 	std::string fps[5] = {"30", "60", "120", "144", "Unlimited"};
-	// auto settingsComp = resources->get_component<SettingsComponent>();
 	
-	// int fps_index = 1;
-	// float volume = 0.5f;
-	// int volume_int;
-	// float sfx_volume = 0.5f;
-	// int sfx_volume_int;
-
 	// Create the window and OpenGL context
 	initWorldSize();
    auto worldBorder = resources->get_component<WorldBorder>();
@@ -52,9 +36,9 @@ int main ()
 	initSettingsComponent();
 	SetExitKey(KEY_NULL);
 
-	Rectangle resumeBtn = {395, 190, 200, 45};	
-	Rectangle exitBtn = {395, 400, 200, 45};
-	Rectangle settBtn = {395, 240, 200, 45};
+	// Rectangle resumeBtn = {395, 190, 200, 45};	
+	// Rectangle exitBtn = {395, 400, 200, 45};
+	// Rectangle settBtn = {395, 240, 200, 45};
 
 	int x_text_position;// = worldBorder->width / 2 - 50;
 
@@ -99,7 +83,7 @@ int main ()
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(WHITE);
 
-		if (!Pause && !Menu){ //Główna gra
+		if (!Menu && !Pause){ //Główna gra
 			if(IsKeyPressed(KEY_ESCAPE)) Pause = !Pause;
 
 			DrawTexturePro(res->background, {0.0f, 0.0f, (float)res->background.width, (float)res->background.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
@@ -153,68 +137,25 @@ int main ()
         die();
         destroy();
 		} 
-		else if((Sett && !Menu) || (Sett && Pause)){ //Ustawienia
-			settingsSystem(&Datalog, &menuANDsett, &Menu, &Sett, mousePosition, KeybindsBtt);
+		else if(Sett){ //Ustawienia
+			settingsSystem(&Datalog, &Pause, &Menu, &Sett, mousePosition, KeybindsBtt);
 		}
 		else if (Menu){ //Menu startowe
-			menuSystem(&Menu, &Sett, &Pause, &menuANDsett, mousePosition, &exit_int);
+			menuSystem(&Menu, &Sett, &Pause, mousePosition, &exit_int);
 			if(exit_int == 1){
 				break; // Exit the game loop
 			}
 		}
-		else { //Menu pauzy
-			DrawText("PAUSED", 400,100,50,RED);
-
-			if(IsMusicStreamPlaying(musicRes->backgroundMusic)){
-				PauseMusicStream(musicRes->backgroundMusic);
+		else if (Pause){ //Menu pauzy
+			pauseSystem(mousePosition, &Pause, &Sett, &Menu, &exit_int);
+			if(exit_int == 1){
+				break; // Exit the game loop
 			}
-
-			if(IsMusicStreamPlaying(musicRes->menuMusic)){
-				UpdateMusicStream(musicRes->menuMusic);
-			} else {
-				PlayMusicStream(musicRes->menuMusic);
-			}
-
-			if (CheckCollisionPointRec(mousePosition, resumeBtn)) {
-				DrawText("Resume", 450, 200, 25, DARKGRAY);
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                Pause = false; // Wracamy do gry
-            }
-        } else {
-				DrawText("Resume", 450, 200, 25, RED);
-		  }
-
-		  if(CheckCollisionPointRec(mousePosition, exitBtn)){
-				DrawText("Exit", 470, 412, 25, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-					 break; // Exit the game loop
-				}
-		  } else {
-				DrawText("Exit", 470, 412, 25, RED);
-		  }
-
-		  if(CheckCollisionPointRec(mousePosition, settBtn)){
-				DrawText("Settings", 445, 250, 25, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-					 Sett = true;
-				}
-		  } else {
-				DrawText("Settings", 445, 250, 25, RED);
-		  }
-
-		  x_text_position = worldBorder->width / 2 - MeasureText("Back to Menu", 25)/2;
-		  if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 300, 200, 30})){
-				DrawText("Back to Menu", x_text_position, 300, 25, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-					 Menu = true;
-				}
-		  } else {
-				DrawText("Back to Menu", x_text_position, 300, 25, RED);
-		  }
 		}
 		EndDrawing();
 	}
-		
+
+	savingSettings();
 	unLoadResources();
 	CloseAudioDevice();
 	CloseWindow();

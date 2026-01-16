@@ -6,7 +6,8 @@
 #include <cmath>
 #include <string>
 #include <iostream>
-
+#include <fstream>
+using namespace std;
 
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
@@ -381,7 +382,35 @@ void suckToBlack(float d) {
 }
 
 
-void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt) {
+void savingSettings(){
+	ofstream ustawienia("settings.txt");
+	auto settingsComp = resources->get_component<SettingsComponent>();
+	auto keyb = resources->get_component<KeyBinds>();
+
+	//ustawienia.open();
+
+	if(ustawienia.is_open()){
+		ustawienia <<"FPS_INDEX "<< (int)settingsComp->fps_index << endl;
+		ustawienia <<"VOLUME "<< settingsComp->volume << endl;
+		ustawienia <<"SFX_VOLUME "<< settingsComp->sfx_volume << endl;
+		ustawienia <<"KEY_UP "<< (int)keyb->up << endl;
+		ustawienia <<"KEY_DOWN "<< (int)keyb->down << endl;
+		ustawienia <<"KEY_LEFT "<< (int)keyb->left << endl;
+		ustawienia <<"KEY_RIGHT "<< (int)keyb->right << endl;
+		ustawienia <<"KEY_SHOOT "<< (int)keyb->shoot << endl;
+		ustawienia <<"KEY_TYPE_SHOOT1 "<< (int)keyb->type_shoot1 << endl;
+		ustawienia <<"KEY_TYPE_SHOOT2 "<< (int)keyb->type_shoot2 << endl;
+		ustawienia <<"KEY_TYPE_SHOOT3 "<< (int)keyb->type_shoot3 << endl;
+		ustawienia.close();
+
+		cout<<"Settings saved"<<endl;
+	}
+	else cout<<"Unable to open file"<<endl;
+	
+
+}
+
+void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt) {
     auto settingsComp = resources->get_component<SettingsComponent>();
     auto worldBorder = resources->get_component<WorldBorder>();
     auto keyb = resources->get_component<KeyBinds>();
@@ -390,9 +419,9 @@ void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Ve
 
     int x_text_position;
     int key_number;
-    int sfx_volume_int;
-    int volume_int;
-    // bool KeybindsBtt[8] = {false};
+   //  int sfx_volume_int;
+   //  int volume_int;
+    
     std::string fps[5] = {"30", "60", "120", "144", "Unlimited"};
     
 
@@ -616,54 +645,56 @@ void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Ve
 			x_text_position = worldBorder->width / 2 - MeasureText("Volume", 30)/2;
 			DrawText("Volume", x_text_position, 550, 30, RED);
 			DrawText("Music:", 100, 590, 25, RED);
-			volume_int = (int)(settingsComp->volume * 10);
+			//volume_int = (int)(settingsComp->volume * 10);
 
 			x_text_position += MeasureText("Volume", 30)/2;
-			DrawText(std::to_string(volume_int).c_str(), x_text_position, 590, 30, BLACK);
+			DrawText(std::to_string(settingsComp->volume).c_str(), x_text_position, 590, 30, BLACK);
 
 			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 590, 30, 30})){
 				DrawText("<", x_text_position - 100, 590, 30, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume > 0.0f){
-					settingsComp->volume -= 0.1f;
-					SetMusicVolume(musicRes->backgroundMusic, settingsComp->volume);
-					SetMusicVolume(musicRes->menuMusic, settingsComp->volume);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume > 0){
+					settingsComp->volume -= 1;
+					//settingsComp->volume -= 0.1f;
+					SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
+					SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
 				}
 			} else {
 				DrawText("<", x_text_position - 100, 590, 30, RED);
 			}
-			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(volume_int).c_str(), 30)) + 100, 590, 30, 30})){
-				DrawText(">", (x_text_position + MeasureText(std::to_string(volume_int).c_str(), 30)) + 100, 590, 30, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume < 1){
-					settingsComp->volume += 0.1f;
-					SetMusicVolume(musicRes->backgroundMusic, settingsComp->volume);
-					SetMusicVolume(musicRes->menuMusic, settingsComp->volume);
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 590, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 590, 30, DARKGRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume < 10){
+					settingsComp->volume += 1;
+					SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
+					SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
 				}
 			} else {
-				DrawText(">", (x_text_position + MeasureText(std::to_string(volume_int).c_str(), 30)) + 100, 590, 30, RED);
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 590, 30, RED);
 			}
 
 			DrawText("Sounds:", 100, 630, 25, RED);
-			sfx_volume_int = (int)(settingsComp->sfx_volume * 10);
+			//sfx_volume_int = (int)(settingsComp->sfx_volume * 10);
 
-			DrawText(std::to_string(sfx_volume_int).c_str(), x_text_position, 630, 30, BLACK);
+			DrawText(std::to_string(settingsComp->sfx_volume).c_str(), x_text_position, 630, 30, BLACK);
 
 			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 630, 30, 30})){
 				DrawText("<", x_text_position - 100, 630, 30, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume > 0.0f){
-					settingsComp->sfx_volume -= 0.1f;
-					SetSoundVolume(res->shootingsfx, settingsComp->sfx_volume);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume > 0){
+					settingsComp->sfx_volume -= 1;
+					SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
 				}
 			} else {
 				DrawText("<", x_text_position - 100, 630, 30, RED);
 			}
-			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(sfx_volume_int).c_str(), 30)) + 100, 630, 30, 30})){
-				DrawText(">", (x_text_position + MeasureText(std::to_string(sfx_volume_int).c_str(), 30)) + 100, 630, 30, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume < 1){
-					settingsComp->sfx_volume += 0.1f;
-					SetSoundVolume(res->shootingsfx, settingsComp->sfx_volume);
+
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 630, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 630, 30, DARKGRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume < 10){
+					settingsComp->sfx_volume += 1;
+					SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
 				}
 			} else {
-				DrawText(">", (x_text_position + MeasureText(std::to_string(sfx_volume_int).c_str(), 30)) + 100, 630, 30, RED);
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 630, 30, RED);
 			}
 
 			//Wyjście z ustawień
@@ -672,25 +703,14 @@ void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Ve
 			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 700, 100, 30})){
 				DrawText("Back", x_text_position, 700, 25, DARKGRAY);
 				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-					if(menuANDsett){
-						*Sett = false;
-						*Menu = true;
-						*menuANDsett = false;
-					}
-					else *Sett = false; // Exit the settings menu
-				}
-		  } else {
-				DrawText("Back", x_text_position, 700, 25, RED);
-		  }
-
+						  *Sett = false;
+                }
+		    } else {
+			    DrawText("Back", x_text_position, 700, 25, RED);
+		    }
 }
 
-// Sett = true;
-// Menu = false;
-// Pause = true;
-// menuANDsett = true;
-
-void menuSystem(bool* Menu, bool* Sett, bool* Pause, bool* menuANDsett, Vector2 mousePosition, int* exit_int) {
+void menuSystem(bool* Menu, bool* Sett, bool* Pause, Vector2 mousePosition, int* exit_int) {
     auto worldBorder = resources->get_component<WorldBorder>();
 	auto musicRes = resources->get_component<MusicResources>();
 	auto res = resources->get_component<soundTextureResources>();
@@ -721,10 +741,7 @@ void menuSystem(bool* Menu, bool* Sett, bool* Pause, bool* menuANDsett, Vector2 
 	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 310, 200, 45})){
 	    DrawText("Settings", x_text_position, 310, 50, DARKGRAY);
 		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-		    *Sett = true;
-			*Menu = false;
-			*Pause = true;
-			*menuANDsett = true;
+		   *Sett = true;
         }
 		} else {
 			DrawText("Settings", x_text_position, 310, 50, BLACK);
@@ -739,4 +756,67 @@ void menuSystem(bool* Menu, bool* Sett, bool* Pause, bool* menuANDsett, Vector2 
 		} else {
 			DrawText("Exit", x_text_position, 412, 50, BLACK);
 		}
+}
+
+void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, int* exit_int) {
+    auto worldBorder = resources->get_component<WorldBorder>();
+    auto musicRes = resources->get_component<MusicResources>();
+    Rectangle resumeBtn = {395, 190, 200, 45};	
+	Rectangle exitBtn = {395, 400, 200, 45};
+	Rectangle settBtn = {395, 240, 200, 45};
+
+    int x_text_position = worldBorder->width/2 - MeasureText("PAUSE", 100)/2;
+
+    DrawText("PAUSE", x_text_position, 100, 50, RED);
+
+	if(IsMusicStreamPlaying(musicRes->backgroundMusic)){
+		PauseMusicStream(musicRes->backgroundMusic);
+	}
+
+	if(IsMusicStreamPlaying(musicRes->menuMusic)){
+		UpdateMusicStream(musicRes->menuMusic);
+	} else {
+		PlayMusicStream(musicRes->menuMusic);
+	}
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Resume", 25)/2;
+	if (CheckCollisionPointRec(mousePosition, resumeBtn)) {
+		DrawText("Resume", x_text_position, 200, 25, DARKGRAY);
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+        *Pause = false; // Wracamy do gry
+    }
+    } else {
+	    DrawText("Resume", x_text_position, 200, 25, RED);
+    }
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Exit", 25)/2;
+	if(CheckCollisionPointRec(mousePosition, exitBtn)){
+		DrawText("Exit", x_text_position, 412, 25, DARKGRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*exit_int = 1; // Exit the game loop
+		}
+	} else {
+		DrawText("Exit", x_text_position, 412, 25, RED);
+	}
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Settings", 25)/2;
+	if(CheckCollisionPointRec(mousePosition, settBtn)){
+		DrawText("Settings", x_text_position, 250, 25, DARKGRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*Sett = true;
+		}
+		} else {
+			DrawText("Settings", x_text_position, 250, 25, RED);
+		}
+
+		x_text_position = worldBorder->width / 2 - MeasureText("Back to Menu", 25)/2;
+    if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 300, 200, 30})){
+		DrawText("Back to Menu", x_text_position, 300, 25, DARKGRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*Menu = true;
+         *Pause = false;
+		}
+	} else {
+		DrawText("Back to Menu", x_text_position, 300, 25, RED);
+    }
 }

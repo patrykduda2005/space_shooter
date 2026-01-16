@@ -109,5 +109,8 @@ typedef struct {
 } SuckedToBlack;
 void suckToBlack(float d);
 
-void menuSystem(bool* Menu, bool* Sett, bool* Pause, bool* menuANDsett, Vector2 mousePosition, int* exit_int);
-void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt);
+void menuSystem(bool* Menu, bool* Sett, bool* Pause, Vector2 mousePosition, int* exit_int);
+void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt);
+void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, int* exit_int);
+
+void savingSettings();
