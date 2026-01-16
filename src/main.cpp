@@ -61,7 +61,7 @@ int main ()
 	SearchAndSetResourceDir("resources");
 	
 
-	//int key_number = 0;
+	int exit_int = 0;
 	int type = 1;
 
 	//WIELKI PIEC
@@ -157,49 +157,10 @@ int main ()
 			settingsSystem(&Datalog, &menuANDsett, &Menu, &Sett, mousePosition, KeybindsBtt);
 		}
 		else if (Menu){ //Menu startowe
-			x_text_position = worldBorder->width / 2 - MeasureText("Rise of the Wielki Piec", 50)/2;
-			DrawText("Rise of the Wielki Piec", x_text_position,100,50,BLACK);
-
-			if(IsMusicStreamPlaying(musicRes->menuMusic)){
-				UpdateMusicStream(musicRes->menuMusic);
-			} else {
-				PlayMusicStream(musicRes->menuMusic);
+			menuSystem(&Menu, &Sett, &Pause, &menuANDsett, mousePosition, &exit_int);
+			if(exit_int == 1){
+				break; // Exit the game loop
 			}
-
-			x_text_position = worldBorder->width / 2 - MeasureText("Start", 50)/2;
-			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 210, 200, 45})){
-				DrawText("Start", x_text_position, 210, 50, DARKGRAY);
-				if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-					 Menu = false; 
-					 Pause = false;
-				}
-		  } else {
-				DrawText("Start", x_text_position, 210, 50, BLACK);
-		  }
-
-		  x_text_position = worldBorder->width / 2 - MeasureText("Settings", 50)/2;
-		  if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 310, 200, 45})){
-				DrawText("Settings", x_text_position, 310, 50, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-					 Sett = true;
-					 Menu = false;
-					 Pause = true;
-					 menuANDsett = true;
-				}
-		  } else {
-				DrawText("Settings", x_text_position, 310, 50, BLACK);
-		  }
-
-		  x_text_position = worldBorder->width / 2 - MeasureText("Exit", 50)/2;
-		  if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 412, 200, 45})){
-				DrawText("Exit", x_text_position, 412, 50, DARKGRAY);
-				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-					 break; // Exit the game loop
-				}
-		  } else {
-				DrawText("Exit", x_text_position, 412, 50, BLACK);
-		  }
-
 		}
 		else { //Menu pauzy
 			DrawText("PAUSED", 400,100,50,RED);

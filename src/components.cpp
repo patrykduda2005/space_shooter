@@ -684,3 +684,59 @@ void settingsSystem(bool* Datalog, bool* menuANDsett, bool* Menu, bool* Sett, Ve
 		  }
 
 }
+
+// Sett = true;
+// Menu = false;
+// Pause = true;
+// menuANDsett = true;
+
+void menuSystem(bool* Menu, bool* Sett, bool* Pause, bool* menuANDsett, Vector2 mousePosition, int* exit_int) {
+    auto worldBorder = resources->get_component<WorldBorder>();
+	auto musicRes = resources->get_component<MusicResources>();
+	auto res = resources->get_component<soundTextureResources>();
+
+    int x_text_position;
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Rise of the Wielki Piec", 50)/2;
+	DrawText("Rise of the Wielki Piec", x_text_position,100,50,BLACK);
+
+	if(IsMusicStreamPlaying(musicRes->menuMusic)){
+		UpdateMusicStream(musicRes->menuMusic);
+	} else {
+		PlayMusicStream(musicRes->menuMusic);
+	}
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Start", 50)/2;
+	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 210, 200, 45})){
+		DrawText("Start", x_text_position, 210, 50, DARKGRAY);
+		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+			 *Menu = false; 
+			 *Pause = false;
+		}
+	} else {
+		DrawText("Start", x_text_position, 210, 50, BLACK);
+	}
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Settings", 50)/2;
+	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 310, 200, 45})){
+	    DrawText("Settings", x_text_position, 310, 50, DARKGRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+		    *Sett = true;
+			*Menu = false;
+			*Pause = true;
+			*menuANDsett = true;
+        }
+		} else {
+			DrawText("Settings", x_text_position, 310, 50, BLACK);
+		}
+
+		x_text_position = worldBorder->width / 2 - MeasureText("Exit", 50)/2;
+		if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 412, 200, 45})){
+		    DrawText("Exit", x_text_position, 412, 50, DARKGRAY);
+			if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+				*exit_int = 1; // Exit the game loop
+			}
+		} else {
+			DrawText("Exit", x_text_position, 412, 50, BLACK);
+		}
+}
