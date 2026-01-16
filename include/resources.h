@@ -15,6 +15,7 @@ typedef struct {
     Sound shootingsfx;
     Texture2D bull;
     Texture2D background;
+    Texture2D shopTexture;
 } soundTextureResources;
 
 void initResources();
@@ -30,16 +31,6 @@ typedef struct{
     KeyboardKey type_shoot3;
 } KeyBinds;
 void initKeyBinds();
-
-// typedef struct {
-//     Sound shootingsfx;
-// } SoundResources;
-// //void initSoundResources();
-
-// typedef struct {
-//     Texture2D bull;
-// }BulletTexture;
-// //void initBulletTexture();
 
 void unLoadResources();
 
@@ -61,5 +52,10 @@ typedef struct {
 	int sfx_volume; // = 0.5f;
 } SettingsComponent;
 void initSettingsComponent();
+
+typedef struct{
+    int money;
+} Money;
+
 
 extern Entity *resources;

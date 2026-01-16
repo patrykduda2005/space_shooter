@@ -19,6 +19,7 @@ void initResources(){
         .shootingsfx = LoadSound("resources/shoot.wav"),
         .bull = LoadTexture("resources/surowka.png"),
         .background = LoadTexture("resources/tlo.png"),
+        .shopTexture = LoadTexture("resources/shop.png"),
     });
 }
 
@@ -82,6 +83,9 @@ void initAmmoCounter(){
     resources->add_component<AmmoCounter>({
         .maxAmmo = {0, 15, 15},
         .currentAmmo = {0, 15, 15},
+    });
+    resources->add_component<Money>({
+        .money = 150,
     });
 }
 

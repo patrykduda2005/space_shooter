@@ -13,7 +13,7 @@ bool Datalog = false;
 bool Sett = false;
 bool KeybindsBtt[8] = {false};
 bool Menu = true;
-//bool menuANDsett = false;
+bool Shop = false;
 
 int main ()
 {
@@ -27,14 +27,13 @@ int main ()
 	initWorldSize();
    auto worldBorder = resources->get_component<WorldBorder>();
 	InitWindow(worldBorder->width, worldBorder->height, "RISE OF THE WIELKI PIEC");
-	SetTargetFPS(60);
 	InitAudioDevice();				  // Initialize audio device
 	initResources();
 	initMusicResources();
 	initAmmoCounter();
 	initKeyBinds();
 	initSettingsComponent();
-	SetExitKey(KEY_NULL);
+	SetExitKey(KEY_MINUS);
 
 	// Rectangle resumeBtn = {395, 190, 200, 45};	
 	// Rectangle exitBtn = {395, 400, 200, 45};
@@ -63,14 +62,19 @@ int main ()
 	auto musicRes = resources->get_component<MusicResources>();
 	auto res = resources->get_component<soundTextureResources>();
 	auto settingsComp = resources->get_component<SettingsComponent>();
+	
+	
 
-	SetMusicVolume(musicRes->backgroundMusic, settingsComp->volume);
-	SetSoundVolume(res->shootingsfx, settingsComp->sfx_volume);
+	if(settingsComp->fps_index < 4) SetTargetFPS(std::stoi(fps[settingsComp->fps_index]));
+	else SetTargetFPS(0);
 
 	
 
 	while (!WindowShouldClose()) {		// run the loop untill the user presses ESCAPE or presses the Close button on the window 
-      
+      SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
+		SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
+		SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
+
 		float d = GetFrameTime();
 		Vector2 mousePosition = GetMousePosition();
 		  
@@ -83,7 +87,7 @@ int main ()
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(WHITE);
 
-		if (!Menu && !Pause){ //Główna gra
+		if (!Menu && !Pause && !Shop && !Sett){ //Główna gra
 			if(IsKeyPressed(KEY_ESCAPE)) Pause = !Pause;
 
 			DrawTexturePro(res->background, {0.0f, 0.0f, (float)res->background.width, (float)res->background.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
@@ -139,15 +143,18 @@ int main ()
 		} 
 		else if(Sett){ //Ustawienia
 			settingsSystem(&Datalog, &Pause, &Menu, &Sett, mousePosition, KeybindsBtt);
+		}		
+		else if (Shop){
+			shopSystem(&Shop, &Pause, &Menu, &Datalog, mousePosition);
 		}
 		else if (Menu){ //Menu startowe
-			menuSystem(&Menu, &Sett, &Pause, mousePosition, &exit_int);
+			menuSystem(&Datalog, &Menu, &Sett, &Pause, &Shop, mousePosition, &exit_int);
 			if(exit_int == 1){
 				break; // Exit the game loop
 			}
 		}
 		else if (Pause){ //Menu pauzy
-			pauseSystem(mousePosition, &Pause, &Sett, &Menu, &exit_int);
+			pauseSystem(mousePosition, &Pause, &Sett, &Menu, &Shop, &exit_int);
 			if(exit_int == 1){
 				break; // Exit the game loop
 			}
