@@ -171,24 +171,24 @@ void bounceOffWalls() {
 }
 
 
-// Entity* spawnEnemy(Position pos) {
-//     Entity* enemy = new Entity();
-//     enemy->add_component<Position>(pos);
-// //     enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
-//     enemy->add_component<Hitbox>({
-//         .layer = HitboxLayer::Enemies,
-//         .interactsWith = HitboxLayer::Players, 
-//         .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
-//         .applies = {create_component<Damage>({.dmg = 1})}
-//     });
-//     enemy->add_component<Hp>({.hp = 10});
-//     enemy->add_component<Velocity>({
-//         .x = 0,
-//         .y = 0
-//     });
+Entity* spawnEnemy(Position pos) {
+    Entity* enemy = new Entity();
+    enemy->add_component<Position>(pos);
+//     enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+    enemy->add_component<Hitbox>({
+        .layer = HitboxLayer::Enemies,
+        .interactsWith = HitboxLayer::Players, 
+        .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
+        .applies = {create_component<Damage>({.dmg = 1})}
+    });
+    enemy->add_component<Hp>({.hp = 10});
+    enemy->add_component<Velocity>({
+        .x = 0,
+        .y = 0
+    });
     
-//     return enemy;  
-// }
+    return enemy;  
+}
 
 
 void spawnBasicEnemy(Position pos) {
