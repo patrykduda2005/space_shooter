@@ -120,25 +120,182 @@ void spawnPlayer() {
 	rabbit->add_component<Shooting>({.cooldown = 0.0});
     rabbit->add_component<Hitbox>({
             .layer = HitboxLayer::Players,
+            .interactsWith = 0,
             .collisionBox = size,
             });
-    rabbit->add_component<Hp>({.hp = 10});
+    rabbit->add_component<Hp>({.hp = 3});
+    rabbit->add_component<Invulnerable>({.timer = 0.0f});
     rabbit->add_component<HpOffset>({
             .global = false,
             .vec = size.left_up_corner - Vec2(0, 25),
             });
 }
 
-void spawnEnemy(Position pos) {
-    Entity* enemy = entities->new_entity();
+void bounceOffWalls() {
+    auto wb = resources->get_component<WorldBorder>();
+    if (!wb) return;
+    
+    for (Entity* ent : entities->get()) {
+        auto bounce = ent->get_component<BounceOffWalls>();
+        auto pos = ent->get_component<Position>();
+        auto vel = ent->get_component<Velocity>();
+        
+        if (!bounce || !pos || !vel) continue;
+        
+        bool bounced = false;
+        
+        if (pos->x < wb->x && vel->x < 0) {
+            vel->x = -vel->x * bounce->bounceStrength;
+            pos->x = wb->x;
+            bounced = true;
+        }
+        
+        if (pos->x > wb->x + wb->width && vel->x > 0) {
+            vel->x = -vel->x * bounce->bounceStrength;
+            pos->x = wb->x + wb->width;
+            bounced = true;
+        }
+        
+        if (pos->y < wb->y && vel->y < 0) {
+            vel->y = -vel->y * bounce->bounceStrength;
+            pos->y = wb->y;
+            bounced = true;
+        }
+        
+        if (pos->y > wb->y + wb->height && vel->y > 0) {
+            vel->y = -vel->y * bounce->bounceStrength;
+            pos->y = wb->y + wb->height;
+            bounced = true;
+        }
+    }
+}
+
+
+Entity* spawnEnemy(Position pos) {
+    Entity* enemy = new Entity();
     enemy->add_component<Position>(pos);
-    enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+//     enemy->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
     enemy->add_component<Hitbox>({
-            .layer = HitboxLayer::Enemies,
-            .interactsWith = HitboxLayer::Players,
-            .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
-            .applies = {create_component<Destroy>({})}
-            });
+        .layer = HitboxLayer::Enemies,
+        .interactsWith = HitboxLayer::Players, 
+        .collisionBox = Area(Vec2(-50,-50), Vec2(50,50)),
+        .applies = {create_component<Damage>({.dmg = 1})}
+    });
     enemy->add_component<Hp>({.hp = 10});
-    enemy->add_component<Velocity>({.x = 0, .y = 0});
+    enemy->add_component<Velocity>({
+        .x = 0,
+        .y = 0
+    });
+    
+    return enemy;  
+}
+
+
+void spawnBasicEnemy(Position pos) {
+        Entity* enemy = spawnEnemy(pos);
+        enemy->add_component<Render>({.txt = LoadTexture("Normalny_przeciwnik.png")});
+        Velocity* vel = enemy->get_component<Velocity>();
+        if (vel) {
+                vel->x = 80;
+                vel->y = 60;
+        }
+
+        enemy->get_component<Hp>()->hp = 12;
+        BounceOffWalls bounce;
+        bounce.bounceStrength = 1.0f;
+        enemy->add_component<BounceOffWalls>({.bounceStrength = 1.0f});
+        entities->attach(enemy);
+}
+
+void spawnTankEnemy(Position pos) {
+    Entity* enemy = spawnEnemy(pos);
+    enemy->add_component<Render>({.txt = LoadTexture("Ciezki_przeciwnik.png")});
+    enemy->add_component<Velocity>({.x = 100, .y = 40});
+    enemy->get_component<Hp>()->hp = 25;
+    entities->attach(enemy);
+}
+
+Entity* createEnemyBullet(Position pos) {
+        Entity* bullet = new Entity();
+        auto res = resources->get_component<soundTextureResources>();
+
+        bullet->add_component<Render>({
+                .txt = LoadTexture("surowka.png")
+        });
+        bullet->add_component<Position>(pos);
+        bullet->add_component<Velocity>({
+                .x = 0,
+                .y = 300
+        });
+        bullet->add_component<DestroyBeyondWorld>({});
+
+        bullet->add_component<Hitbox>({
+                .layer = HitboxLayer::Enemies,
+                .interactsWith = HitboxLayer::Players,
+                .collisionBox = Area(
+                        Vec2(-10, -20),
+                        Vec2(10, 20)
+                ),
+                .applies = {create_component<Damage>({
+                        .dmg = 1
+                })}
+        });
+
+        return bullet;
+}
+
+void spawnShootingEnemy(Position pos) {
+    Entity* enemy = spawnEnemy(pos);
+    enemy->add_component<Render>({.txt = LoadTexture("strzelajacy_przeciwnik.png")});
+    enemy->add_component<Velocity>({.x = 100, .y = 40});
+    enemy->get_component<Hp>()->hp = 8;
+    
+    enemy->add_component<ShootingEnemyTag>({});
+    
+    enemy->add_component<Shooting>({.cooldown = 0.0f});
+    
+    entities->attach(enemy);
+}
+
+void updateInvulnerability(float d) {
+    for (Entity* ent : entities->get()) {
+        auto invuln = ent->get_component<Invulnerable>();
+        if (!invuln) continue;
+        
+        invuln->timer -= d;
+        if (invuln->timer <= 0) {
+            ent->remove_component<Invulnerable>();
+        }
+    }
+}
+
+void updateShootingEnemies(float d) {
+    static float shootTimer = 0.0f;
+    static float shootInterval = 0.8f;
+    
+    shootTimer += d;
+    
+    if (shootTimer >= shootInterval) {
+        shootTimer = 0.0f;
+        
+        std::vector<Entity*> shootingEnemies;
+        for (Entity* ent : entities->get()) {
+            auto tag = ent->get_component<ShootingEnemyTag>();
+            if (tag) {
+                shootingEnemies.push_back(ent);
+            }
+        }
+        
+        if (shootingEnemies.empty()) return;
+        
+        int randomIndex = GetRandomValue(0, shootingEnemies.size() - 1);
+        Entity* shooter = shootingEnemies[randomIndex];
+        
+        auto pos = shooter->get_component<Position>();
+        if (pos) {
+            
+            entities->attach(createEnemyBullet(*pos));
+            
+        }
+    }
 }
