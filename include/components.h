@@ -141,4 +141,25 @@ void updateInvulnerability(float d);
 typedef struct {
 } ShootingEnemyTag;
 
-void updateShootingEnemies(float d);
+typedef struct {
+    float cooldown;
+} EnemyShooting;
+
+void updateEnemyShooting(float d);
+
+typedef struct {
+    int type;
+    int value;
+} DropItem;
+
+typedef struct {
+    Texture txt;
+} ItemRender;
+
+void spawnDropItem(Position pos, int type);
+void updateDropItems(float d);
+void collectDropItems();
+
+typedef struct {
+    int dropType;
+} CollectDrop;
