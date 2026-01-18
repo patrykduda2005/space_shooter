@@ -11,10 +11,11 @@
 bool Pause = false;
 bool Datalog = false;
 bool Sett = false;
-bool KeybindsBtt[9] = {false};
+bool KeybindsBtt[10] = {false};
 bool Menu = true;
 bool Shop = false;
 bool hasStarted = false;
+bool Game_Over = false;
 
 
 void initGame() {
@@ -112,14 +113,15 @@ int main ()
 		// Setup the back buffer for drawing (clear color and depth buffers)
 		ClearBackground(WHITE);
 
-		if (!Menu && !Pause && !Shop && !Sett){ //Główna gra
+		if (!Menu && !Pause && !Shop && !Sett && !Game_Over){ //Główna gra
             hasStarted = true;
 			if(IsKeyPressed(KEY_ESCAPE)) Pause = !Pause;
 
 			DrawTexturePro(res->background, {0.0f, 0.0f, (float)res->background.width, (float)res->background.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
 			
+
 			//Ammo counter
-			DrawText("Ammo", 875,650,25,WHITE);
+			DrawText("Ammo", 875,620,25,WHITE);
 			DrawText("Money: ", 800, 20, 20, WHITE);
 			DrawText(std::to_string(cash->money).c_str(), 880,20,20,WHITE);
 			
@@ -138,6 +140,7 @@ int main ()
 			if (IsKeyPressed(keyb->type_shoot2)) type = 2;
 			if (IsKeyPressed(keyb->type_shoot3)) type = 3;
 			if( IsKeyPressed(keyb->type_shoot4)) type = 4;
+			if( IsKeyPressed(keyb->type_shoot5)) type = 5;
 			
 			if(Datalog){
 				DrawText("FPS:", 50,700,15,WHITE);
@@ -174,6 +177,20 @@ int main ()
 		collectDropItems();
 		updateDropItems(d);
 		collectDropItems();
+
+			for(int i = 0; i < entities->get().size(); i++){
+				auto hp = entities->get()[i]->get_component<Hp>();
+				auto movement = entities->get()[i]->get_component<ArrowMovement>();
+				if(hp && movement){
+					if(hp->hp <= 0){
+						Game_Over = true;
+						std::cout << "Game Over!" << std::endl;
+					}
+				}
+				
+				
+			}
+
         die();
         destroy();
 		} 
@@ -194,6 +211,13 @@ int main ()
 			pauseSystem(mousePosition, &Pause, &Sett, &Menu, &Shop, &exit_int);
 			if(exit_int == 1){
 				break; // Exit the game loop
+			}
+		}
+		else if (Game_Over){
+			GameOver();
+			if(IsKeyPressed(KEY_ENTER)){
+				Menu = true;
+				Game_Over = false;
 			}
 		}
 		EndDrawing();

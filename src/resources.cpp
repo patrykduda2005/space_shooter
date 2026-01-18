@@ -19,7 +19,7 @@ void initResources(){
         .shootingsfx = LoadSound("resources/shoot.wav"),
         .bull = LoadTexture("resources/surowka.png"),
         .background = LoadTexture("resources/tlo.png"),
-        .shopTexture = LoadTexture("resources/shop.png"),
+        .shopTexture = LoadTexture("resources/sklep.png"),
         .blackhole = LoadTexture("resources/surowka-black.png"),
         .sniper_bullet = LoadTexture("resources/surowka-boom.png"),
         .hp = LoadTexture("resources/hp_drop.png"),
@@ -29,6 +29,7 @@ void initResources(){
         .normalny_przeciwnik = LoadTexture("resources/Normalny_przeciwnik.png"),
         .ciezki_przeciwnik = LoadTexture("resources/Ciezki_przeciwnik.png"),
         .strzelajacy_przeciwnik = LoadTexture("resources/strzelajacy_przeciwnik.png"),
+        .gameover = LoadTexture("resources/gameover.png"),  
     });
 }
 
@@ -42,6 +43,7 @@ void initKeyBinds(){
     int type_shoot2 = KEY_TWO;
     int type_shoot3 = KEY_THREE;
     int type_shoot4 = KEY_FOUR;
+    int type_shoot5 = KEY_FIVE;
 
     ifstream ustawienia("resources/settings.txt");
     //ustawienia.open();
@@ -58,7 +60,9 @@ void initKeyBinds(){
             if(key == "KEY_TYPE_SHOOT2") ustawienia>>type_shoot2;
             if(key == "KEY_TYPE_SHOOT3") ustawienia>>type_shoot3;
             if(key == "KEY_TYPE_SHOOT4") ustawienia>>type_shoot4;
+            if(key == "KEY_TYPE_SHOOT5") ustawienia>>type_shoot5;
         }
+        ustawienia.close();
     }
 
     resources->add_component<KeyBinds>({
@@ -71,6 +75,7 @@ void initKeyBinds(){
         .type_shoot2 = (KeyboardKey)type_shoot2,
         .type_shoot3 = (KeyboardKey)type_shoot3,
         .type_shoot4 = (KeyboardKey)type_shoot4,
+        .type_shoot5 = (KeyboardKey)type_shoot5,
     });
 }
 
@@ -82,6 +87,11 @@ void unLoadResources(){
     auto bulletTexComp = resources->get_component<soundTextureResources>();
     if(bulletTexComp){
         UnloadTexture(bulletTexComp->bull);
+        UnloadTexture(bulletTexComp->background);
+        UnloadTexture(bulletTexComp->shopTexture);
+        UnloadTexture(bulletTexComp->blackhole);
+        UnloadTexture(bulletTexComp->sniper_bullet);
+        UnloadTexture(bulletTexComp->shatter);
     }
     auto musicComp = resources->get_component<MusicResources>();
     if(musicComp){
@@ -93,8 +103,8 @@ void unLoadResources(){
 
 void initAmmoCounter(){
     resources->add_component<AmmoCounter>({
-        .maxAmmo = {0, 20, 20, 20},
-        .currentAmmo = {0, 15, 1, 1},
+        //.maxAmmo = {0, 20, 20, 20},
+        .currentAmmo = {15, 5, 2, 2},
     });
     resources->add_component<Money>({
         .money = 50,

@@ -170,3 +170,4 @@ void collectDropItems();
 typedef struct {
     int dropType;
 } CollectDrop;
+void GameOver();

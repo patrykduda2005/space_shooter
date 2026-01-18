@@ -25,6 +25,7 @@ typedef struct {
     Texture2D normalny_przeciwnik;
     Texture2D ciezki_przeciwnik;
     Texture2D strzelajacy_przeciwnik;
+    Texture2D gameover;
 } soundTextureResources;
 
 void initResources();
@@ -39,13 +40,14 @@ typedef struct{
     KeyboardKey type_shoot2;
     KeyboardKey type_shoot3;
     KeyboardKey type_shoot4;
+    KeyboardKey type_shoot5;
 } KeyBinds;
 void initKeyBinds();
 
 void unLoadResources();
 
 typedef struct {
-    int maxAmmo[4];
+    //int maxAmmo[4];
     int currentAmmo[4];
 } AmmoCounter;
 void initAmmoCounter();
