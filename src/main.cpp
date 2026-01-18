@@ -14,18 +14,13 @@ bool Sett = false;
 bool KeybindsBtt[9] = {false};
 bool Menu = true;
 bool Shop = false;
+bool hasStarted = false;
 
-int main ()
-{
-	// Tell the window to use vsync and work on high DPI displays
-	//SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
 
-	std::string fps[5] = {"30", "60", "120", "144", "Unlimited"};
-	
+void initGame() {
 	// Create the window and OpenGL context
 	initWorldSize();
-   auto worldBorder = resources->get_component<WorldBorder>();
+    auto worldBorder = resources->get_component<WorldBorder>();
 	InitWindow(worldBorder->width, worldBorder->height, "RISE OF THE WIELKI PIEC");
 	InitAudioDevice();				  // Initialize audio device
 	initResources();
@@ -35,39 +30,10 @@ int main ()
 	initSettingsComponent();
 	SetExitKey(KEY_MINUS);
 
-	// Rectangle resumeBtn = {395, 190, 200, 45};	
-	// Rectangle exitBtn = {395, 400, 200, 45};
-	// Rectangle settBtn = {395, 240, 200, 45};
-
-	int x_text_position;// = worldBorder->width / 2 - 50;
-
 	SearchAndSetResourceDir("resources");
-	
-
-	int exit_int = 0;
-	int type = 1;
-
-	//WIELKI PIEC
-
-
-    // spawnEnemy({.x = 500, .y = 500});
-    // spawnEnemy({.x = 500, .y = 100});
-    // spawnEnemy({.x = 200, .y = 300});
-    // spawnEnemy({.x = 300, .y = 300});
-
-     spawnPlayer();
-	// game loop
-	
-	auto keyb = resources->get_component<KeyBinds>();
-	auto musicRes = resources->get_component<MusicResources>();
-	auto res = resources->get_component<soundTextureResources>();
-	auto settingsComp = resources->get_component<SettingsComponent>();
-	auto cash = resources->get_component<Money>();
+    spawnPlayer();
 	
 	
-
-	if(settingsComp->fps_index < 4) SetTargetFPS(std::stoi(fps[settingsComp->fps_index]));
-	else SetTargetFPS(0);
 
 
 	Entity* waveManager = entities->new_entity();
@@ -79,6 +45,55 @@ int main ()
 	wm.waveTimer = 0.0f;
 	wm.spawnTimer = 0.5f;
 	waveManager->add_component<WaveManager>(wm);
+}
+
+void resetAll() {
+    for (Entity* ent : entities->get()) {
+        entities->kill_entity(ent);
+    }
+    resources->remove_component<AmmoCounter>();
+    resources->remove_component<Money>();
+
+    initAmmoCounter();
+    spawnPlayer();
+	Entity* waveManager = entities->new_entity();
+	WaveManager wm;
+	wm.currentWave = 1;
+	wm.enemiesInWave = 8;
+	wm.enemiesKilled = 0;
+	wm.waveActive = true;
+	wm.waveTimer = 0.0f;
+	wm.spawnTimer = 0.5f;
+	waveManager->add_component<WaveManager>(wm);
+}
+
+int main ()
+{
+	// Tell the window to use vsync and work on high DPI displays
+	//SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+	SetConfigFlags(FLAG_WINDOW_HIGHDPI);
+
+	
+    initGame();
+	int x_text_position;// = worldBorder->width / 2 - 50;
+
+	
+
+	int exit_int = 0;
+	int type = 1;
+
+	std::string fps[5] = {"30", "60", "120", "144", "Unlimited"};
+	auto keyb = resources->get_component<KeyBinds>();
+	auto musicRes = resources->get_component<MusicResources>();
+	auto res = resources->get_component<soundTextureResources>();
+	auto settingsComp = resources->get_component<SettingsComponent>();
+	auto cash = resources->get_component<Money>();
+    auto worldBorder = resources->get_component<WorldBorder>();
+	
+
+	if(settingsComp->fps_index < 4) SetTargetFPS(std::stoi(fps[settingsComp->fps_index]));
+	else SetTargetFPS(0);
+
 
 	while (!WindowShouldClose()) {		// run the loop untill the user presses ESCAPE or presses the Close button on the window 
       SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
@@ -98,6 +113,7 @@ int main ()
 		ClearBackground(WHITE);
 
 		if (!Menu && !Pause && !Shop && !Sett){ //Główna gra
+            hasStarted = true;
 			if(IsKeyPressed(KEY_ESCAPE)) Pause = !Pause;
 
 			DrawTexturePro(res->background, {0.0f, 0.0f, (float)res->background.width, (float)res->background.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
@@ -168,6 +184,7 @@ int main ()
 			shopSystem(&Shop, &Pause, &Menu, &Datalog, mousePosition);
 		}
 		else if (Menu){ //Menu startowe
+            if (hasStarted) resetAll();
 			menuSystem(&Datalog, &Menu, &Sett, &Pause, &Shop, mousePosition, &exit_int);
 			if(exit_int == 1){
 				break; // Exit the game loop
