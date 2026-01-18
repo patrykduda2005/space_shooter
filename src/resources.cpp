@@ -22,6 +22,13 @@ void initResources(){
         .shopTexture = LoadTexture("resources/shop.png"),
         .blackhole = LoadTexture("resources/surowka-black.png"),
         .sniper_bullet = LoadTexture("resources/surowka-boom.png"),
+        .hp = LoadTexture("resources/hp_drop.png"),
+        .shatter = LoadTexture("resources/surowka-shattering.png"),
+        .boom = LoadTexture("resources/boom.png"),
+        .wielki_piec = LoadTexture("resources/wielki_piec.png"),
+        .normalny_przeciwnik = LoadTexture("resources/Normalny_przeciwnik.png"),
+        .ciezki_przeciwnik = LoadTexture("resources/Ciezki_przeciwnik.png"),
+        .strzelajacy_przeciwnik = LoadTexture("resources/strzelajacy_przeciwnik.png"),
     });
 }
 

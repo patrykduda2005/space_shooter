@@ -18,6 +18,13 @@ typedef struct {
     Texture2D shopTexture;
     Texture2D blackhole;
     Texture2D sniper_bullet;
+    Texture2D hp;
+    Texture2D shatter;
+    Texture2D boom;
+    Texture2D wielki_piec;
+    Texture2D normalny_przeciwnik;
+    Texture2D ciezki_przeciwnik;
+    Texture2D strzelajacy_przeciwnik;
 } soundTextureResources;
 
 void initResources();

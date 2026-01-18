@@ -28,7 +28,8 @@ Entity* basicBullet(Position pos) {
 
 Entity* sniperBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
-    bullet->get_component<Render>()->txt = LoadTexture("surowka-boom.png");
+    auto* textures = resources->get_component<soundTextureResources>();
+    bullet->get_component<Render>()->txt = textures->sniper_bullet;
     bullet->get_component<Velocity>()->y *= 2;
     Hitbox* hitbox = bullet->get_component<Hitbox>();
     hitbox->applies = {};
@@ -50,7 +51,8 @@ Entity* shatteredBullet(Position pos, Hitbox* hitbox) {
 
 Entity* shatterBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
-    bullet->get_component<Render>()->txt = LoadTexture("surowka-shattering.png");
+    auto* textures = resources->get_component<soundTextureResources>();
+    bullet->get_component<Render>()->txt = textures->shatter;
     Hitbox* hitbox = bullet->get_component<Hitbox>();
     Entity* bullet2 = shatteredBullet(pos, hitbox);
     bullet2->get_component<Velocity>()->x = 500;
@@ -68,7 +70,8 @@ Entity* shatterBullet(Position pos) {
 
 Entity* blackBullet(Position pos) {
     Entity* bullet = basicBullet(pos);
-    bullet->get_component<Render>()->txt = LoadTexture("surowka-black.png");
+    auto* textures = resources->get_component<soundTextureResources>();
+    bullet->get_component<Render>()->txt = textures->blackhole;
     bullet->get_component<Velocity>()->y = -100;
     bullet->remove_component<Hitbox>();
     ComponentHandle die = create_component<Delay>({
@@ -86,7 +89,8 @@ Entity* blackBullet(Position pos) {
 
 Entity* boom(Position pos) {
     Entity* boom = new Entity();
-    Texture2D txt = LoadTexture("boom.png");
+    auto* textures = resources->get_component<soundTextureResources>();
+    Texture2D txt = textures->boom;
     boom->add_component<Render>({.txt = txt});
     Area hitboxSize = Area(
             Vec2(txt.width, txt.height) * -0.5,
@@ -113,7 +117,8 @@ void spawnPlayer() {
     Area size = Area(textureSize * -0.5, textureSize * 0.5);
 
     Entity* rabbit = entities->new_entity();
-    rabbit->add_component<Render>({.txt = LoadTexture("wielki_piec.png")});
+    auto* textures = resources->get_component<soundTextureResources>();
+    rabbit->add_component<Render>({.txt = textures->wielki_piec});
     rabbit->add_component<Position>({.x = 500, .y = 700});
     rabbit->add_component<ArrowMovement>({200, 400, 200, 400});
     rabbit->add_component<RestrictToWorld>({});	
@@ -193,7 +198,8 @@ Entity* spawnEnemy(Position pos) {
 
 void spawnBasicEnemy(Position pos) {
         Entity* enemy = spawnEnemy(pos);
-        enemy->add_component<Render>({.txt = LoadTexture("Normalny_przeciwnik.png")});
+        auto res = resources->get_component<soundTextureResources>();
+        enemy->add_component<Render>({.txt = res->normalny_przeciwnik});
         Velocity* vel = enemy->get_component<Velocity>();
         if (vel) {
                 vel->x = 80;
@@ -209,7 +215,8 @@ void spawnBasicEnemy(Position pos) {
 
 void spawnTankEnemy(Position pos) {
     Entity* enemy = spawnEnemy(pos);
-    enemy->add_component<Render>({.txt = LoadTexture("Ciezki_przeciwnik.png")});
+    auto res = resources->get_component<soundTextureResources>();
+    enemy->add_component<Render>({.txt = res->ciezki_przeciwnik});
     enemy->add_component<Velocity>({.x = 100, .y = 40});
     enemy->get_component<Hp>()->hp = 25;
     entities->attach(enemy);
@@ -220,7 +227,7 @@ Entity* createEnemyBullet(Position pos) {
         auto res = resources->get_component<soundTextureResources>();
 
         bullet->add_component<Render>({
-                .txt = LoadTexture("surowka.png")
+                .txt = res->bull
         });
         bullet->add_component<Position>(pos);
         bullet->add_component<Velocity>({
@@ -247,7 +254,8 @@ Entity* createEnemyBullet(Position pos) {
 
 void spawnShootingEnemy(Position pos) {
     Entity* enemy = spawnEnemy(pos);
-    enemy->add_component<Render>({.txt = LoadTexture("strzelajacy_przeciwnik.png")});
+    auto res = resources->get_component<soundTextureResources>();
+    enemy->add_component<Render>({.txt = res->strzelajacy_przeciwnik});
     enemy->add_component<Velocity>({.x = 100, .y = 40});
     enemy->get_component<Hp>()->hp = 8;
     enemy->add_component<EnemyShooting>({.cooldown = 0.0f});

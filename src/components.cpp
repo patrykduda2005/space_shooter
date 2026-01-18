@@ -1205,23 +1205,25 @@ void spawnDropItem(Position pos, int type) {
     Entity* drop = new Entity();
     drop->add_component<Position>(pos);
     drop->add_component<DropItem>({.type = type, .value = (type == 3) ? 1 : 5}); // 5 ammo lub 1 hp
+
+    soundTextureResources* textures = resources->get_component<soundTextureResources>();
     
     Texture2D tempTexture;
     switch(type) {
         case 1:
-            tempTexture = LoadTexture("surowka.png");
+            tempTexture = textures->bull;
             break;
 
         case 2:
-            tempTexture = LoadTexture("surowka-black.png");
+            tempTexture = textures->blackhole;
             break;
 
         case 3:
-            tempTexture = LoadTexture("hp_drop.png");
+            tempTexture = textures->hp;
             break;
 
         default:
-            tempTexture = LoadTexture("surowka.png");
+            tempTexture = textures->bull;
     }
     
     drop->add_component<Render>({.txt = tempTexture});
