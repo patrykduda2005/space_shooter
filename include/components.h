@@ -53,6 +53,7 @@ enum HitboxLayer {
     Bullets = (1 << 30),
     Enemies = (1 << 29),
     Effects = (1 << 28),
+    EnemyBullets = (1 << 27),
 };
 
 typedef struct {
@@ -65,7 +66,7 @@ typedef struct {
     std::vector<ComponentHandle> applies;
 } Hitbox;
 void detectCollision();
-void outlineColliders();
+void outlineColliders(bool Datalog);
 void removeHitbox();
 
 typedef struct {

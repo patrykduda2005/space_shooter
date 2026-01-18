@@ -223,7 +223,8 @@ void removeHitbox() {
     }
 }
 
-void outlineColliders() {
+void outlineColliders(bool Datalog) {
+    if (!Datalog) return;
     for (Entity *ent : entities->get()) {
         auto col = ent->get_components<Hitbox>();
         auto pos = ent->get_component<Position>();

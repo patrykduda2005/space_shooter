@@ -228,9 +228,10 @@ Entity* createEnemyBullet(Position pos) {
                 .y = 300
         });
         bullet->add_component<DestroyBeyondWorld>({});
+        bullet->add_component<SuckedToBlack>({});
 
         bullet->add_component<Hitbox>({
-                .layer = HitboxLayer::Enemies,
+                .layer = HitboxLayer::EnemyBullets,
                 .interactsWith = HitboxLayer::Players,
                 .collisionBox = Area(
                         Vec2(-10, -20),
@@ -252,7 +253,7 @@ void spawnShootingEnemy(Position pos) {
     
     enemy->add_component<ShootingEnemyTag>({});
     
-    enemy->add_component<Shooting>({.cooldown = 0.0f});
+    //enemy->add_component<Shooting>({.cooldown = 0.0f});
     
     entities->attach(enemy);
 }

@@ -153,7 +153,7 @@ int main ()
       arrowMovement(d);
       restrictToWorld(d);
       destroyBeyondWorld();
-      outlineColliders();
+      outlineColliders(Datalog);
 		ammoCounter(type);
         displayhp();
 		updateInvulnerability(d);
