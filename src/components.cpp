@@ -353,6 +353,7 @@ void damage() {
         auto dmg = ent->get_component<Damage>();
         auto hp = ent->get_component<Hp>();
         auto invuln = ent->get_component<Invulnerable>();
+        auto res = resources->get_component<soundTextureResources>();
 
         if(invuln && invuln->timer > 0) {
             ent->remove_component<Damage>();
@@ -365,6 +366,7 @@ void damage() {
 
         if (ent->get_component<ArrowMovement>()) {
             ent->add_component<Invulnerable>({.timer = 1.0f});
+            ent->add_component<DamageEffect>({});
         }
     }
 }
@@ -1220,7 +1222,7 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 			if(cash && cash->money >= 50) {
             cash->money -= 50;
-            ammoComp->currentAmmo[1] += 10;
+            ammoComp->currentAmmo[0] += 10;
             }
 		}
 	}
@@ -1233,7 +1235,7 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 			if(cash && cash->money >= 50){ 
                 cash->money -= 50;
-                ammoComp->currentAmmo[2] += 5;
+                ammoComp->currentAmmo[1] += 5;
             }
 		}
 	}
@@ -1247,7 +1249,7 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 			if(cash && cash->money >= 50) {
                 cash->money -= 50;
-                ammoComp->currentAmmo[3] += 1;
+                ammoComp->currentAmmo[2] += 1;
             }
 		}
 	}
@@ -1349,8 +1351,8 @@ void collectDropItems() {
                 {
                     auto ammoComp = resources->get_component<AmmoCounter>();
                     if (ammoComp) {
-                        ammoComp->currentAmmo[1] += drop->value;
-                        if (ammoComp->currentAmmo[1] > 99) ammoComp->currentAmmo[1] = 99;
+                        ammoComp->currentAmmo[0] += drop->value;
+                        if (ammoComp->currentAmmo[0] > 99) ammoComp->currentAmmo[1] = 99;
                     }
                     break;
                 }
@@ -1360,7 +1362,7 @@ void collectDropItems() {
                     auto ammoComp = resources->get_component<AmmoCounter>();
                     if (ammoComp) {
                         ammoComp->currentAmmo[2] += drop->value;
-                        if (ammoComp->currentAmmo[2] > 99) ammoComp->currentAmmo[2] = 99;
+                        if (ammoComp->currentAmmo[2] > 99) ammoComp->currentAmmo[3] = 99;
                     }
                     break;
                 }
@@ -1393,4 +1395,31 @@ void GameOver(){
     DrawTexturePro(res->gameover, {0.0f, 0.0f, (float)res->gameover.width, (float)res->gameover.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
 
     
+}
+
+void damageEffect() {
+    for (Entity* ent : entities->get()) {
+        auto pos = ent->get_component<Position>();
+        auto eff = ent->get_component<DamageEffect>();
+        auto rm = ent->get_component<RemoveDamageEffect>();
+        auto del = ent->get_component<Delay>();
+        if (!pos || !eff) continue;
+        auto res = resources->get_component<WorldBorder>();
+        if (!res) continue;
+        DrawRectangle(res->x, res->y, res->width, res->height, {255, 100, 100, 200});
+        if (!ent->get_component<Delay>()) ent->add_component<Delay>({
+                .comps = {create_component<RemoveDamageEffect>({})},
+                .timestamp = GetTime(),
+                .delay = 0.08,
+                });
+    }
+}
+
+void removeDamageEffect() {
+    for (Entity* ent : entities->get()) {
+        auto rm = ent->get_component<RemoveDamageEffect>();
+        if (!rm) continue;
+        ent->remove_component<DamageEffect>();
+        ent->remove_component<RemoveDamageEffect>();
+    }
 }

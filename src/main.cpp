@@ -154,6 +154,8 @@ int main ()
 			
 			}
 
+            damageEffect();
+      removeDamageEffect();
         removeHitbox();
     	detectCollision();
         suckToBlack(d);
@@ -166,6 +168,7 @@ int main ()
 		updateVelocity(d);
       renderThings(d);
       arrowMovement(d);
+
       restrictToWorld(d);
       destroyBeyondWorld();
       outlineColliders(Datalog);

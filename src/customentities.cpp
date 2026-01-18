@@ -73,6 +73,7 @@ Entity* blackBullet(Position pos) {
     auto* textures = resources->get_component<soundTextureResources>();
     bullet->get_component<Render>()->txt = textures->blackhole;
     bullet->get_component<Velocity>()->y = -100;
+    bullet->add_component<SuckedToBlack>({});
     bullet->remove_component<Hitbox>();
     ComponentHandle die = create_component<Delay>({
             .comps = {create_component<Destroy>({})},

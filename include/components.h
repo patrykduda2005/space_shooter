@@ -171,3 +171,11 @@ typedef struct {
     int dropType;
 } CollectDrop;
 void GameOver();
+
+typedef struct {
+} DamageEffect;
+void damageEffect();
+
+typedef struct {
+} RemoveDamageEffect;
+void removeDamageEffect();
