@@ -142,3 +142,8 @@ typedef struct {
 } ShootingEnemyTag;
 
 void updateShootingEnemies(float d);
+void menuSystem(bool* Datalog, bool* Menu, bool* Sett, bool* Pause, bool* Shop, Vector2 mousePosition, int* exit_int);
+void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt);
+void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, bool* Shop, int* exit_int);
+void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mousePosition);
+void savingSettings();

@@ -6,7 +6,8 @@
 #include <cmath>
 #include <string>
 #include <iostream>
-
+#include <fstream>
+using namespace std;
 
 
 void updateGravity(float d) {
@@ -591,3 +592,531 @@ void spawnFormationWave(int formationType, int count) {
     }
 }
 
+
+void savingSettings(){
+	ofstream ustawienia("settings.txt");
+	auto settingsComp = resources->get_component<SettingsComponent>();
+	auto keyb = resources->get_component<KeyBinds>();
+
+	//ustawienia.open();
+
+	if(ustawienia.is_open()){
+		ustawienia <<"FPS_INDEX "<< (int)settingsComp->fps_index << endl;
+		ustawienia <<"VOLUME "<< settingsComp->volume << endl;
+		ustawienia <<"SFX_VOLUME "<< settingsComp->sfx_volume << endl;
+		ustawienia <<"KEY_UP "<< (int)keyb->up << endl;
+		ustawienia <<"KEY_DOWN "<< (int)keyb->down << endl;
+		ustawienia <<"KEY_LEFT "<< (int)keyb->left << endl;
+		ustawienia <<"KEY_RIGHT "<< (int)keyb->right << endl;
+		ustawienia <<"KEY_SHOOT "<< (int)keyb->shoot << endl;
+		ustawienia <<"KEY_TYPE_SHOOT1 "<< (int)keyb->type_shoot1 << endl;
+		ustawienia <<"KEY_TYPE_SHOOT2 "<< (int)keyb->type_shoot2 << endl;
+		ustawienia <<"KEY_TYPE_SHOOT3 "<< (int)keyb->type_shoot3 << endl;
+		ustawienia.close();
+
+		cout<<"Settings saved"<<endl;
+	}
+	else cout<<"Unable to open file"<<endl;
+	
+
+}
+
+void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt) {
+    auto settingsComp = resources->get_component<SettingsComponent>();
+    auto worldBorder = resources->get_component<WorldBorder>();
+    auto keyb = resources->get_component<KeyBinds>();
+	auto musicRes = resources->get_component<MusicResources>();
+	auto res = resources->get_component<soundTextureResources>();
+
+    int x_text_position;
+    int key_number;
+   //  int sfx_volume_int;
+   //  int volume_int;
+    
+    std::string fps[5] = {"30", "60", "120", "144", "Unlimited"};
+    
+
+    if(IsMusicStreamPlaying(musicRes->backgroundMusic)){
+				StopMusicStream(musicRes->backgroundMusic);
+			}
+
+			if(IsMusicStreamPlaying(musicRes->menuMusic)){
+				UpdateMusicStream(musicRes->menuMusic);
+			} else {
+				PlayMusicStream(musicRes->menuMusic);
+			}
+
+			x_text_position = worldBorder->width / 2 - MeasureText("Settings", 50)/2;
+
+			if(*Datalog){
+				DrawText("x:", 50,700,15,BLACK);
+				DrawText(std::to_string(mousePosition.x).c_str(), 80,700,15,BLACK);
+				DrawText("y:", 175,700,15,BLACK);	
+				DrawText(std::to_string(mousePosition.y).c_str(), 205,700,15,BLACK);
+				//DrawLine(395, 0, 395, 800, BLACK);
+				//DrawLine(605, 0, 603	, 800, BLACK);
+			}
+			DrawText("Settings", x_text_position, 28, 50, BLACK);
+			
+			//Ilość fpsów
+
+			x_text_position = worldBorder->width / 2 - MeasureText("FPS", 30)/2;
+			DrawText("FPS", x_text_position, 100, 30, BLACK);
+
+			x_text_position = worldBorder->width / 2 - MeasureText(fps[settingsComp->fps_index].c_str(), 30)/2;
+			DrawText(fps[settingsComp->fps_index].c_str(), x_text_position, 130, 30, BLACK);
+
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 130, 30, 30})){
+				DrawText("<", x_text_position - 100, 130, 30, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->fps_index > 0){
+					settingsComp->fps_index--;
+					SetTargetFPS(std::stoi(fps[settingsComp->fps_index]));
+				}
+			} else {
+				DrawText("<", x_text_position - 100, 130, 30, BLACK);
+			}
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(fps[settingsComp->fps_index].c_str(), 30)) + 100, 130, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(fps[settingsComp->fps_index].c_str(), 30)) + 100, 130, 30, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->fps_index < 4){
+					settingsComp->fps_index++;
+					if(settingsComp->fps_index == 4) SetTargetFPS(0);
+					else SetTargetFPS(std::stoi(fps[settingsComp->fps_index]));
+				}
+			} else {
+				DrawText(">", (x_text_position + MeasureText(fps[settingsComp->fps_index].c_str(), 30)) + 100, 130, 30, BLACK);
+			}
+
+			x_text_position = worldBorder->width / 2 - MeasureText("Key binds", 30)/2;
+			DrawText("Key binds", x_text_position, 180, 30, BLACK);
+
+			DrawText("Up: ", 100, 220, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 220, 400, 30})){
+				DrawRectangle(250, 220, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[0]) DrawText(GetKeyText(keyb->up), 300, 225, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[0] = true;
+				}
+			} else {
+				DrawRectangle(250, 220, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->up), 300, 225, 25, BLACK);
+			}
+			if(KeybindsBtt[0]) {
+				DrawText("Press a key...", 410, 225, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->up = (KeyboardKey)key_number;
+					KeybindsBtt[0] = false;
+				}
+			}
+
+			DrawText("Down: ", 100, 260, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 260, 400, 30})){
+				DrawRectangle(250, 260, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[1]) DrawText(GetKeyText(keyb->down), 300, 265, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[1] = true;
+				}
+			} else {
+				DrawRectangle(250, 260, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->down), 300, 265, 25, BLACK);
+			}
+			if(KeybindsBtt[1]) {
+				DrawText("Press a key...", 410, 265, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->down = (KeyboardKey)key_number;
+					KeybindsBtt[1] = false;
+				}
+			}
+			DrawText("Left: ", 100, 300, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 300, 400, 30})){
+				DrawRectangle(250, 300, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[2]) DrawText(GetKeyText(keyb->left), 300, 305, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[2] = true;
+				}
+			} else {
+				DrawRectangle(250, 300, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->left), 300, 305, 25, BLACK);
+			}
+			if(KeybindsBtt[2]) {
+				DrawText("Press a key...", 410, 305, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->left = (KeyboardKey)key_number;
+					KeybindsBtt[2] = false;
+				}
+			}
+
+			DrawText("Right: ", 100, 340, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 340, 400, 30})){
+				DrawRectangle(250, 340, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[3]) DrawText(GetKeyText(keyb->right), 300, 345, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[3] = true;
+				}
+			} else {
+				DrawRectangle(250, 340, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->right), 300, 345, 25, BLACK);
+			}
+			if(KeybindsBtt[3]) {
+				DrawText("Press a key...", 410, 345, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->right = (KeyboardKey)key_number;
+					KeybindsBtt[3] = false;
+				}
+			}
+			DrawText("Shoot: ", 100, 380, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 380, 400, 30})){
+				DrawRectangle(250, 380, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[4]) DrawText(GetKeyText(keyb->shoot), 300, 385, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[4] = true;
+				}
+			} else {
+				DrawRectangle(250, 380, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->shoot), 300, 385, 25, BLACK);
+			}
+			if(KeybindsBtt[4]) {
+				DrawText("Press a key...", 410, 385, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->shoot = (KeyboardKey)key_number;
+					KeybindsBtt[4] = false;
+				}
+			}
+			DrawText("Shoot 1: ", 100, 420, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 420, 400, 30})){
+				DrawRectangle(250, 420, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[5]) DrawText(GetKeyText(keyb->type_shoot1), 300, 425, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[5] = true;
+				}
+			} else {
+				DrawRectangle(250, 420, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->type_shoot1), 300, 425, 25, BLACK);
+			}
+			if(KeybindsBtt[5]) {
+				DrawText("Press a key...", 410, 425, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->type_shoot1 = (KeyboardKey)key_number;
+					KeybindsBtt[5] = false;
+				}
+			}
+			DrawText("Shoot 2: ", 100, 460, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 460, 400, 30})){
+				DrawRectangle(250, 460, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[6]) DrawText(GetKeyText(keyb->type_shoot2), 300, 465, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[6] = true;
+				}
+			} else {
+				DrawRectangle(250, 460, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->type_shoot2), 300, 465, 25, BLACK);
+			}
+			if(KeybindsBtt[6]) {
+				DrawText("Press a key...", 410, 465, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->type_shoot2 = (KeyboardKey)key_number;
+					KeybindsBtt[6] = false;
+				}
+			}
+
+			DrawText("Shoot 3: ", 100, 500, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 500, 400, 30})){
+				DrawRectangle(250, 500, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[7]) DrawText(GetKeyText(keyb->type_shoot3), 300, 505, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[7] = true;
+				}
+			} else {
+				DrawRectangle(250, 500, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->type_shoot3), 300, 505, 25, BLACK);
+			}
+			if(KeybindsBtt[7]) {
+				DrawText("Press a key...", 410, 505, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->type_shoot3 = (KeyboardKey)key_number;
+					KeybindsBtt[7] = false;
+				}
+			}
+			//Głośność muzyki i dźwięków
+			x_text_position = worldBorder->width / 2 - MeasureText("Volume", 30)/2;
+			DrawText("Volume", x_text_position, 550, 30, BLACK);
+			DrawText("Music:", 100, 590, 25, BLACK);
+			//volume_int = (int)(settingsComp->volume * 10);
+
+			x_text_position += MeasureText("Volume", 30)/2;
+			DrawText(std::to_string(settingsComp->volume).c_str(), x_text_position, 590, 30, BLACK);
+
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 590, 30, 30})){
+				DrawText("<", x_text_position - 100, 590, 30, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume > 0){
+					settingsComp->volume -= 1;
+					//settingsComp->volume -= 0.1f;
+					SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
+					SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
+				}
+			} else {
+				DrawText("<", x_text_position - 100, 590, 30, BLACK);
+			}
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 590, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 590, 30, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume < 10){
+					settingsComp->volume += 1;
+					SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
+					SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
+				}
+			} else {
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 590, 30, BLACK);
+			}
+
+			DrawText("Sounds:", 100, 630, 25, BLACK);
+			//sfx_volume_int = (int)(settingsComp->sfx_volume * 10);
+
+			DrawText(std::to_string(settingsComp->sfx_volume).c_str(), x_text_position, 630, 30, BLACK);
+
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 630, 30, 30})){
+				DrawText("<", x_text_position - 100, 630, 30, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume > 0){
+					settingsComp->sfx_volume -= 1;
+					SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
+				}
+			} else {
+				DrawText("<", x_text_position - 100, 630, 30, BLACK);
+			}
+
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 630, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 630, 30, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume < 10){
+					settingsComp->sfx_volume += 1;
+					SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
+				}
+			} else {
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 630, 30, BLACK);
+			}
+
+			//Wyjście z ustawień
+			x_text_position = worldBorder->width / 2 - MeasureText("Back", 25)/2;
+
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 700, 100, 30})){
+				DrawText("Back", x_text_position, 700, 25, GRAY);
+				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+						  *Sett = false;
+                }
+		    } else {
+			    DrawText("Back", x_text_position, 700, 25, BLACK);
+		    }
+}
+
+void menuSystem(bool* Datalog, bool* Menu, bool* Sett, bool* Pause, bool *Shop, Vector2 mousePosition, int* exit_int) {
+   auto worldBorder = resources->get_component<WorldBorder>();
+	auto musicRes = resources->get_component<MusicResources>();
+	auto res = resources->get_component<soundTextureResources>();
+
+	int x_text_position;
+
+
+	if(Datalog){
+		DrawText("x:", 50,700,15,WHITE);
+		DrawText(std::to_string(mousePosition.x).c_str(), 80,700,15,BLACK);
+		DrawText("y:", 175,700,15,WHITE);	
+		DrawText(std::to_string(mousePosition.y).c_str(), 205,700,15,BLACK);
+	}
+
+
+   x_text_position = worldBorder->width / 2 - MeasureText("Rise of the Wielki Piec", 50)/2;
+	DrawText("Rise of the Wielki Piec", x_text_position,100,50,BLACK);
+
+	if(IsMusicStreamPlaying(musicRes->menuMusic)){
+		UpdateMusicStream(musicRes->menuMusic);
+	} else {
+		PlayMusicStream(musicRes->menuMusic);
+	}
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Start", 50)/2;
+	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 210, 200, 45})){
+		DrawText("Start", x_text_position, 210, 50, GRAY);
+		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+			 *Menu = false; 
+			 *Pause = false;
+		}
+	} else {
+		DrawText("Start", x_text_position, 210, 50, BLACK);
+	}
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Shop", 50)/2;
+	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 310, (float)MeasureText("Shop", 50), 45})){
+	   DrawText("Shop", x_text_position, 310, 50, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+		   *Shop = true;
+      }
+	} else {
+		DrawText("Shop", x_text_position, 310, 50, BLACK);
+	}
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Settings", 50)/2;
+	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 410, (float)MeasureText("Settings", 50), 45})){
+	   DrawText("Settings", x_text_position, 410, 50, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+		   *Sett = true;
+      }
+	} else {
+		DrawText("Settings", x_text_position, 410, 50, BLACK);
+	}
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Exit", 50)/2;
+	if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 512, 200, 45})){
+		DrawText("Exit", x_text_position, 512, 50, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*exit_int = 1; // Exit the game loop
+		}
+	} else {
+		DrawText("Exit", x_text_position, 512, 50, BLACK);
+	}
+}
+
+void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, bool* Shop, int* exit_int) {
+    auto worldBorder = resources->get_component<WorldBorder>();
+    auto musicRes = resources->get_component<MusicResources>();
+    Rectangle resumeBtn = {395, 190, 200, 45};	
+	Rectangle exitBtn = {395, 400, 200, 45};
+	Rectangle settBtn = {395, 240, 200, 45};
+
+    int x_text_position = worldBorder->width / 2 - MeasureText("PAUSE", 50)/2;
+
+   DrawText("PAUSE", x_text_position, 100, 50, BLACK);
+
+	if(IsMusicStreamPlaying(musicRes->backgroundMusic)){
+		PauseMusicStream(musicRes->backgroundMusic);
+	}
+
+	if(IsMusicStreamPlaying(musicRes->menuMusic)){
+		UpdateMusicStream(musicRes->menuMusic);
+	} else {
+		PlayMusicStream(musicRes->menuMusic);
+	}
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Resume", 25)/2;
+	if (CheckCollisionPointRec(mousePosition, resumeBtn)) {
+		DrawText("Resume", x_text_position, 200, 25, GRAY);
+    if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+        *Pause = false; // Wracamy do gry
+    }
+    } else {
+	    DrawText("Resume", x_text_position, 200, 25, BLACK);
+    }
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Exit", 25)/2;
+	if(CheckCollisionPointRec(mousePosition, exitBtn)){
+		DrawText("Exit", x_text_position, 412, 25, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*exit_int = 1; // Exit the game loop
+		}
+	} else {
+		DrawText("Exit", x_text_position, 412, 25, BLACK);
+	}
+
+    x_text_position = worldBorder->width / 2 - MeasureText("Settings", 25)/2;
+	if(CheckCollisionPointRec(mousePosition, settBtn)){
+		DrawText("Settings", x_text_position, 250, 25, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*Sett = true;
+		}
+		} else {
+			DrawText("Settings", x_text_position, 250, 25, BLACK);
+		}
+
+		x_text_position = worldBorder->width / 2 - MeasureText("Back to Menu", 25)/2;
+    if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 350, 200, 30})){
+		DrawText("Back to Menu", x_text_position, 350, 25, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*Menu = true;
+         *Pause = false;
+		}
+	} else {
+		DrawText("Back to Menu", x_text_position, 350, 25, BLACK);
+   }
+
+	x_text_position = worldBorder->width / 2 - MeasureText("Shop", 25)/2;
+	if(CheckCollisionPointRec(mousePosition,{(float)x_text_position,300, (float)MeasureText("Shop", 25),30})){
+		DrawText("Shop", x_text_position, 300, 25, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*Shop = true;
+		}
+	} else {
+		DrawText("Shop", x_text_position, 300, 25, BLACK);
+	}
+}
+
+
+
+void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mousePosition){
+	auto cash = resources->get_component<Money>();
+	auto worldBorder = resources->get_component<WorldBorder>();
+	auto res = resources->get_component<soundTextureResources>();
+		
+	int x_text_position, y_text_position;
+	y_text_position = worldBorder->height - 100;
+
+	DrawTexturePro(res->shopTexture, {0.0f, 0.0f, (float)res->shopTexture.width, (float)res->shopTexture.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
+
+	if(*Datalog){
+		DrawText("x:", 50,700,15,WHITE);
+		DrawText(std::to_string(mousePosition.x).c_str(), 80,700,15,WHITE);
+		DrawText("y:", 175,700,15,WHITE);	
+		DrawText(std::to_string(mousePosition.y).c_str(), 205,700,15,WHITE);
+	}
+	
+	x_text_position = 720;
+
+	DrawText("Money: ", x_text_position, 40, 50, WHITE);
+	x_text_position += 180;
+	DrawText(std::to_string(cash->money).c_str(), x_text_position, 40, 50, WHITE);
+		
+	DrawTexture(res->bull, 348, 648, WHITE);
+	
+	DrawText("25", 351, 750, 25, WHITE);
+	if(CheckCollisionPointRec(mousePosition, {315, 605, 95, 100})){	
+		DrawRectangleRounded({315, 605, 95, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+			cash->money -= 25;
+		}
+	}
+
+	DrawText("25", 491, 750, 25, WHITE);
+	if(CheckCollisionPointRec(mousePosition, {460, 605, 95, 100})){	
+		DrawRectangleRounded({460, 605, 95, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+			//cos
+		}
+	}
+	DrawText("25", 636, 750, 25, WHITE);
+	if(CheckCollisionPointRec(mousePosition, {605, 605, 95, 100})){	
+		DrawRectangleRounded({605, 605, 95, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+			//cos
+		}
+	}
+
+	x_text_position = worldBorder->width / 8 - MeasureText("Back" , 25)/2;
+
+	if(CheckCollisionPointRec(mousePosition,{(float)x_text_position,100, (float)MeasureText("Back",25),30})){
+		DrawText("Back", x_text_position, 100, 25, GRAY);
+		if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+			*Shop = false;
+		}
+	} else DrawText("Back", x_text_position, 100, 25, WHITE);
+}
