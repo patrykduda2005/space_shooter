@@ -71,7 +71,7 @@ void shoot(int tab){//, int *ammoPointer) {
                 //std::cout << "Shooting!\n";
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
-            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 2) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[0] > 0 && shootComp->cooldown <= 0 && tab == 2) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
@@ -90,11 +90,11 @@ void shoot(int tab){//, int *ammoPointer) {
                 entities->attach(bullet3);
 #endif
                 
-                if (ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
+                if (ammoComp->currentAmmo[0] > 0) ammoComp->currentAmmo[0] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
 
             }
-            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 3) {
+            else if (IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[1] > 0 && shootComp->cooldown <= 0 && tab == 3) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
@@ -111,19 +111,28 @@ void shoot(int tab){//, int *ammoPointer) {
                 entities->attach(bullet2);
 #endif
              
-                if(ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
+                if(ammoComp->currentAmmo[1] > 0) ammoComp->currentAmmo[1] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
             }
-            else if(IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[3] > 0 && shootComp->cooldown <= 0 && tab == 4) {
+            else if(IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[2] > 0 && shootComp->cooldown <= 0 && tab == 4) {
                 // Create a first bullet entity
                 PlaySound(res->shootingsfx);
 
                 entities->attach(blackBullet(*pos));
 
+                if (ammoComp->currentAmmo[2] > 0) ammoComp->currentAmmo[2] -= 1;
+                shootComp->cooldown = 0.25; // half a second cooldown
+            }
+            else if(IsKeyDown (keyb->shoot) && ammoComp->currentAmmo[3] > 0 && shootComp->cooldown <= 0 && tab == 5) {
+                // Create a first bullet entity
+                PlaySound(res->shootingsfx);
+
+                entities->attach(shatterBullet(*pos));
+
                 if (ammoComp->currentAmmo[3] > 0) ammoComp->currentAmmo[3] -= 1;
                 shootComp->cooldown = 0.25; // half a second cooldown
+            }
         }
-    }
     }
 }
 void arrowMovement(float d) {
@@ -251,40 +260,59 @@ void destroy() {
 
 void ammoCounter(int type){ 
     auto ammoComp = resources->get_component<AmmoCounter>();
+    auto res = resources->get_component<soundTextureResources>();
     
     if(type == 1){
-			DrawText("o", 875,675,35,WHITE);
-			DrawText("o", 885,675,35,WHITE);
-			DrawText("1", 920,675,35,WHITE);
+			DrawText("o", 875,645,35,WHITE);
+			DrawText("o", 885,645,35,WHITE);
+			//DrawText("1", 920,655,35,WHITE);
+            DrawTexture(res->bull, 920, 645, WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[0]).c_str(), 875,675,25,WHITE);
 			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
-            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,760,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,735,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,765,25,WHITE);
 		}
 		else if(type == 2){ 
-			DrawText("o", 875,675,25,WHITE);
-			DrawText("o", 885,675,25,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,35,WHITE);
-			DrawText("2", 920,700,35,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
-            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,760,25,WHITE);
+			DrawText("o", 875,645,25,WHITE);
+			DrawText("o", 885,645,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[0]).c_str(), 875,675,35,WHITE);
+			//DrawText("2", 920,685,35,WHITE);
+            DrawTexture(res->bull, 920, 675, WHITE);
+            DrawTexture(res->bull, 930, 680, WHITE);
+            DrawTexture(res->bull, 940, 685, WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,735,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,765,25,WHITE);
 		}
 		else if(type == 3){ 
-			DrawText("o", 875,675,25,WHITE);
-			DrawText("o", 885,675,25,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,35,WHITE);
-			DrawText("3", 920,730,35,WHITE);
-            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,760,25,WHITE);
+			DrawText("o", 875,645,25,WHITE);
+			DrawText("o", 885,645,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[0]).c_str(), 875,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,35,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,735,25,WHITE);
+			//DrawText("3", 920,730,35,WHITE);
+            DrawTexture(res->sniper_bullet, 920, 705, WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,765,25,WHITE);
 		}
         else if(type == 4){ 
-			DrawText("o", 875,675,25,WHITE);
-			DrawText("o", 885,675,25,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,700,25,WHITE);
-			DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,730,25,WHITE);
-            
-            
-            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,760,35,WHITE);
-			DrawText("4", 920,760,35,WHITE);
+			DrawText("o", 875,645,25,WHITE);
+			DrawText("o", 885,645,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[0]).c_str(), 875,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,735,35,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,765,25,WHITE);
+			//DrawText("4", 920,775,35,WHITE);
+            DrawTexture(res->blackhole, 920, 735, WHITE);
+		}
+        else if(type == 5){ 
+			DrawText("o", 875,645,25,WHITE);
+			DrawText("o", 885,645,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[0]).c_str(), 875,675,25,WHITE);
+			DrawText(std::to_string(ammoComp->currentAmmo[1]).c_str(), 875,705,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[2]).c_str(), 875,735,25,WHITE);
+            DrawText(std::to_string(ammoComp->currentAmmo[3]).c_str(), 875,765,35,WHITE);
+			//DrawText("5", 920,775,35,WHITE);
+            DrawTexture(res->shater, 920, 765, WHITE);
 		}
 
 }
@@ -639,6 +667,7 @@ void savingSettings(){
 		ustawienia <<"KEY_TYPE_SHOOT2 "<< (int)keyb->type_shoot2 << endl;
 		ustawienia <<"KEY_TYPE_SHOOT3 "<< (int)keyb->type_shoot3 << endl;
         ustawienia <<"KEY_TYPE_SHOOT4 "<< (int)keyb->type_shoot4 << endl;
+        ustawienia <<"KEY_TYPE_SHOOT5 "<< (int)keyb->type_shoot5 << endl;
 		ustawienia.close();
 
 		cout<<"Settings saved"<<endl;
@@ -900,19 +929,39 @@ void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 
 					KeybindsBtt[8] = false;
 				}
 			}
-				
+			
+            DrawText("Shoot 5: ", 100, 580, 25, BLACK);
+			if(CheckCollisionPointRec(mousePosition, {250, 580, 400, 30})){
+				DrawRectangle(250, 580, 400, 30, LIGHTGRAY);
+				if(!KeybindsBtt[9]) DrawText(GetKeyText(keyb->type_shoot5), 300, 585, 25, BLACK);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+					KeybindsBtt[9] = true;
+				}
+			} else {
+				DrawRectangle(250, 580, 400, 30, GRAY);
+				DrawText(GetKeyText(keyb->type_shoot5), 300, 585, 25, BLACK);
+			}
+			if(KeybindsBtt[9]) {
+				DrawText("Press a key...", 410, 585, 25, BLACK);
+				key_number = GetKeyPressed();
+				if(key_number != 0){
+					keyb->type_shoot5 = (KeyboardKey)key_number;
+					KeybindsBtt[9] = false;
+				}
+			}
 			
 			//Głośność muzyki i dźwięków
 			x_text_position = worldBorder->width / 2 - MeasureText("Volume", 30)/2;
-			DrawText("Volume", x_text_position, 590, 30, BLACK);
-			DrawText("Music:", 100, 630, 25, BLACK);
+			DrawText("Volume", x_text_position, 630, 30, BLACK);
+			DrawText("Music:", 100, 670, 25, BLACK);
 			//volume_int = (int)(settingsComp->volume * 10);
 
 			x_text_position += MeasureText("Volume", 30)/2;
-			DrawText(std::to_string(settingsComp->volume).c_str(), x_text_position, 630, 30, BLACK);
+			DrawText(std::to_string(settingsComp->volume).c_str(), x_text_position, 670, 30, BLACK);
 
-			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 630, 30, 30})){
-				DrawText("<", x_text_position - 100, 630, 30, GRAY);
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 670, 30, 30})){
+				DrawText("<", x_text_position - 100, 670, 30, GRAY);
 				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume > 0){
 					settingsComp->volume -= 1;
 					//settingsComp->volume -= 0.1f;
@@ -920,54 +969,54 @@ void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 
 					SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
 				}
 			} else {
-				DrawText("<", x_text_position - 100, 630, 30, BLACK);
+				DrawText("<", x_text_position - 100, 670, 30, BLACK);
 			}
-			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 630, 30, 30})){
-				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 630, 30, GRAY);
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 670, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 670, 30, GRAY);
 				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->volume < 10){
 					settingsComp->volume += 1;
 					SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
 					SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
 				}
 			} else {
-				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 630, 30, BLACK);
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->volume).c_str(), 30)) + 100, 670, 30, BLACK);
 			}
 
-			DrawText("Sounds:", 100, 670, 25, BLACK);
+			DrawText("Sounds:", 100, 710, 25, BLACK);
 			//sfx_volume_int = (int)(settingsComp->sfx_volume * 10);
 
-			DrawText(std::to_string(settingsComp->sfx_volume).c_str(), x_text_position, 670, 30, BLACK);
+			DrawText(std::to_string(settingsComp->sfx_volume).c_str(), x_text_position, 710, 30, BLACK);
 
-			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 670, 30, 30})){
-				DrawText("<", x_text_position - 100, 670, 30, GRAY);
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position - 100, 710, 30, 30})){
+				DrawText("<", x_text_position - 100, 710, 30, GRAY);
 				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume > 0){
 					settingsComp->sfx_volume -= 1;
 					SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
 				}
 			} else {
-				DrawText("<", x_text_position - 100, 670, 30, BLACK);
+				DrawText("<", x_text_position - 100, 710, 30, BLACK);
 			}
 
-			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 670, 30, 30})){
-				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 670, 30, GRAY);
+			if(CheckCollisionPointRec(mousePosition, {(float)(x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 710, 30, 30})){
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 710, 30, GRAY);
 				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && settingsComp->sfx_volume < 10){
 					settingsComp->sfx_volume += 1;
 					SetSoundVolume(res->shootingsfx, (float)settingsComp->sfx_volume/10);
 				}
 			} else {
-				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 670, 30, BLACK);
+				DrawText(">", (x_text_position + MeasureText(std::to_string(settingsComp->sfx_volume).c_str(), 30)) + 100, 710, 30, BLACK);
 			}
 
 			//Wyjście z ustawień
-			x_text_position = worldBorder->width / 2 - MeasureText("Back", 25)/2;
+			x_text_position = worldBorder->width / 8 - MeasureText("Back", 25)/2;
 
-			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 710, 100, 30})){
-				DrawText("Back", x_text_position, 710, 25, GRAY);
+			if(CheckCollisionPointRec(mousePosition, {(float)x_text_position, 28, 100, 30})){
+				DrawText("Back", x_text_position, 28, 25, GRAY);
 				if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
 						  *Sett = false;
                 }
 		    } else {
-			    DrawText("Back", x_text_position, 710, 25, BLACK);
+			    DrawText("Back", x_text_position, 28, 25, BLACK);
 		    }
 }
 
@@ -1137,13 +1186,13 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 	x_text_position += 180;
 	DrawText(std::to_string(cash->money).c_str(), x_text_position, 40, 50, WHITE);
 		
-	DrawTexture(res->bull, 335, 645, WHITE);
-    DrawTexture(res->bull, 345, 645, WHITE);
-    DrawTexture(res->bull, 355, 645, WHITE);
+	DrawTexture(res->bull, 217, 625, WHITE);
+    DrawTexture(res->bull, 227, 635, WHITE);
+    DrawTexture(res->bull, 237, 630, WHITE);
 	
-	DrawText("50", 351, 750, 25, WHITE);
-	if(CheckCollisionPointRec(mousePosition, {315, 605, 95, 100})){	
-		DrawRectangleRounded({315, 605, 95, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+	DrawText("50", 230, 745, 25, BLACK);
+	if(CheckCollisionPointRec(mousePosition, {200, 590, 100, 100})){	
+		DrawRectangleRounded({200, 590, 100, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 			if(cash && cash->money >= 50) {
             cash->money -= 50;
@@ -1152,11 +1201,11 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 		}
 	}
     //Texture2D blacktxt = LoadTexture("resources/surowka-black.png");
-    DrawTexture(res->sniper_bullet, 490, 645, WHITE);
+    DrawTexture(res->sniper_bullet, 400, 625, WHITE);
 
-	DrawText("50", 491, 750, 25, WHITE);
-	if(CheckCollisionPointRec(mousePosition, {460, 605, 95, 100})){	
-		DrawRectangleRounded({460, 605, 95, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+	DrawText("50", 400, 745, 25, BLACK);
+	if(CheckCollisionPointRec(mousePosition, {370, 590, 100, 100})){	
+		DrawRectangleRounded({370, 590, 100, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 			if(cash && cash->money >= 50){ 
                 cash->money -= 50;
@@ -1166,11 +1215,23 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 	}
 
     //Texture2D bombastic = LoadTexture("resources/surowka-boom.png");
-    DrawTexture(res->blackhole, 635, 645, WHITE);
+    DrawTexture(res->blackhole, 560, 625, WHITE);
 
-	DrawText("50", 636, 750, 25, WHITE);
-	if(CheckCollisionPointRec(mousePosition, {605, 605, 95, 100})){	
-		DrawRectangleRounded({605, 605, 95, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+	DrawText("50", 565, 745, 25, BLACK);
+	if(CheckCollisionPointRec(mousePosition, {535, 590, 100, 100})){	
+		DrawRectangleRounded({535, 590, 100, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
+		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+			if(cash && cash->money >= 50) {
+                cash->money -= 50;
+                ammoComp->currentAmmo[3] += 1;
+            }
+		}
+	}
+
+    DrawTexture(res->shater, 720, 625, BLACK);
+    DrawText("50", 730, 745, 25, BLACK);
+	if(CheckCollisionPointRec(mousePosition, {700, 590, 100, 100})){	
+		DrawRectangleRounded({700, 590, 100, 100}, 0.2f, 0.5f, Fade(GRAY, 0.2f));
 		if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
 			if(cash && cash->money >= 50) {
                 cash->money -= 50;
@@ -1187,4 +1248,14 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 			*Shop = false;
 		}
 	} else DrawText("Back", x_text_position, 100, 25, WHITE);
+}
+
+
+void GameOver(){
+    auto worldBorder = resources->get_component<WorldBorder>();
+    auto res = resources->get_component<soundTextureResources>();
+
+    DrawTexturePro(res->gameover, {0.0f, 0.0f, (float)res->gameover.width, (float)res->gameover.height}, {0.0f, 0.0f, worldBorder->width, worldBorder->height}, {0.0f, 0.0f}, 0.0f, WHITE);
+
+    
 }

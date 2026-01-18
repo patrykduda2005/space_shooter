@@ -147,3 +147,5 @@ void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 
 void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, bool* Shop, int* exit_int);
 void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mousePosition);
 void savingSettings();
+
+void GameOver();

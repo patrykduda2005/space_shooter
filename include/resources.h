@@ -18,6 +18,8 @@ typedef struct {
     Texture2D shopTexture;
     Texture2D blackhole;
     Texture2D sniper_bullet;
+    Texture2D shater;
+    Texture2D gameover;
 } soundTextureResources;
 
 void initResources();
@@ -32,13 +34,14 @@ typedef struct{
     KeyboardKey type_shoot2;
     KeyboardKey type_shoot3;
     KeyboardKey type_shoot4;
+    KeyboardKey type_shoot5;
 } KeyBinds;
 void initKeyBinds();
 
 void unLoadResources();
 
 typedef struct {
-    int maxAmmo[4];
+    //int maxAmmo[4];
     int currentAmmo[4];
 } AmmoCounter;
 void initAmmoCounter();
