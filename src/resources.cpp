@@ -20,6 +20,8 @@ void initResources(){
         .bull = LoadTexture("resources/surowka.png"),
         .background = LoadTexture("resources/tlo.png"),
         .shopTexture = LoadTexture("resources/shop.png"),
+        .blackhole = LoadTexture("resources/surowka-black.png"),
+        .sniper_bullet = LoadTexture("resources/surowka-boom.png"),
     });
 }
 
@@ -32,6 +34,7 @@ void initKeyBinds(){
     int type_shoot1 = KEY_ONE;
     int type_shoot2 = KEY_TWO;
     int type_shoot3 = KEY_THREE;
+    int type_shoot4 = KEY_FOUR;
 
     ifstream ustawienia("resources/settings.txt");
     //ustawienia.open();
@@ -47,6 +50,7 @@ void initKeyBinds(){
             if(key == "KEY_TYPE_SHOOT1") ustawienia>>type_shoot1;
             if(key == "KEY_TYPE_SHOOT2") ustawienia>>type_shoot2;
             if(key == "KEY_TYPE_SHOOT3") ustawienia>>type_shoot3;
+            if(key == "KEY_TYPE_SHOOT4") ustawienia>>type_shoot4;
         }
     }
 
@@ -59,6 +63,7 @@ void initKeyBinds(){
         .type_shoot1 = (KeyboardKey)type_shoot1,
         .type_shoot2 = (KeyboardKey)type_shoot2,
         .type_shoot3 = (KeyboardKey)type_shoot3,
+        .type_shoot4 = (KeyboardKey)type_shoot4,
     });
 }
 
@@ -81,11 +86,11 @@ void unLoadResources(){
 
 void initAmmoCounter(){
     resources->add_component<AmmoCounter>({
-        .maxAmmo = {0, 15, 15},
-        .currentAmmo = {0, 15, 15},
+        .maxAmmo = {0, 20, 20, 20},
+        .currentAmmo = {0, 15, 1, 1},
     });
     resources->add_component<Money>({
-        .money = 150,
+        .money = 50,
     });
 }
 

@@ -11,7 +11,7 @@
 bool Pause = false;
 bool Datalog = false;
 bool Sett = false;
-bool KeybindsBtt[8] = {false};
+bool KeybindsBtt[9] = {false};
 bool Menu = true;
 bool Shop = false;
 
@@ -62,6 +62,7 @@ int main ()
 	auto musicRes = resources->get_component<MusicResources>();
 	auto res = resources->get_component<soundTextureResources>();
 	auto settingsComp = resources->get_component<SettingsComponent>();
+	auto cash = resources->get_component<Money>();
 	
 	
 
@@ -107,6 +108,8 @@ int main ()
 			
 			//Ammo counter
 			DrawText("Ammo", 875,650,25,WHITE);
+			DrawText("Money: ", 800, 20, 20, WHITE);
+			DrawText(std::to_string(cash->money).c_str(), 880,20,20,WHITE);
 			
 			if(IsMusicStreamPlaying(musicRes->menuMusic)){
 				StopMusicStream(musicRes->menuMusic);
@@ -122,6 +125,7 @@ int main ()
 			if (IsKeyPressed(keyb->type_shoot1)) type = 1;
 			if (IsKeyPressed(keyb->type_shoot2)) type = 2;
 			if (IsKeyPressed(keyb->type_shoot3)) type = 3;
+			if( IsKeyPressed(keyb->type_shoot4)) type = 4;
 			
 			if(Datalog){
 				DrawText("FPS:", 50,700,15,WHITE);
