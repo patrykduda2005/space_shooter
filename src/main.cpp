@@ -80,10 +80,6 @@ int main ()
 	wm.spawnTimer = 0.5f;
 	waveManager->add_component<WaveManager>(wm);
 
-	std::cout << "WaveMangaer stworzony. Pierwsza fala za 3s..." << std::endl;
-
-	
-
 	while (!WindowShouldClose()) {		// run the loop untill the user presses ESCAPE or presses the Close button on the window 
       SetMusicVolume(musicRes->backgroundMusic, (float)settingsComp->volume/10);
 		SetMusicVolume(musicRes->menuMusic, (float)settingsComp->volume/10);
@@ -157,8 +153,11 @@ int main ()
 		ammoCounter(type);
         displayhp();
 		updateInvulnerability(d);
-		updateShootingEnemies(d);
+		updateEnemyShooting(d);
         damage();
+		collectDropItems();
+		updateDropItems(d);
+		collectDropItems();
         die();
         destroy();
 		} 

@@ -45,12 +45,20 @@ void renderThings(float d) {
         auto ent = entities->get()[i];
         auto ren = ent->get_component<Render>();
         auto pos = ent->get_component<Position>();
+        
+        // Sprawdź najpierw czy to item
+        auto itemRender = ent->get_component<ItemRender>();
+        if (itemRender && pos) {
+            DrawTexture(itemRender->txt, pos->x - itemRender->txt.width/2, pos->y - itemRender->txt.height/2, WHITE);
+            continue; // Nie renderuj dalej
+        }
+        
+        // Normalne renderowanie
         if (ren && pos) {
             DrawTexture(ren->txt, pos->x - ren->txt.width/2, pos->y - ren->txt.height/2, WHITE);
         }
     }
 }
-
 
 void shoot(int tab){//, int *ammoPointer) {
     auto keyb = resources->get_component<KeyBinds>();
@@ -311,6 +319,7 @@ void displayhp() {
             DrawText(hpText, pos->x, pos->y, 25, RED);
     }
 }
+
 void damage() {
     for (Entity* ent : entities->get()) {
         auto dmg = ent->get_component<Damage>();
@@ -335,10 +344,24 @@ void damage() {
 void die() {
     for (Entity* ent : entities->get()) {
         auto hp = ent->get_component<Hp>();
-        auto cash = resources->get_component<Money>();
         if (hp && hp->hp <= 0) {
+            // Sprawdź czy to wróg (nie gracz)
+            auto hitbox = ent->get_component<Hitbox>();
+            if (hitbox && (hitbox->layer & HitboxLayer::Enemies)) {
+                auto cash = resources->get_component<Money>();
+                if(cash)cash->money += 10;
+                auto pos = ent->get_component<Position>();
+                if (pos) {
+                    // 45% szansy na drop
+                    int chance = GetRandomValue(1, 100);
+                    if (chance <= 45) {
+                        // Losowy typ itemu: 1 - ammo2, 2 - ammo3, 3 - hp
+                        int dropType = GetRandomValue(1, 3);
+                        spawnDropItem(*pos, dropType);
+                    }
+                }
+            }
             entities->kill_entity(ent);
-            if(cash)cash->money += 10;
         }
     }
 }
@@ -484,10 +507,6 @@ void startNextWave(WaveManager* waveMgr) {
         case 3:
             waveMgr->enemiesInWave = 18;
             break;
-
-        case 4:
-            waveMgr->enemiesInWave = 5;
-            break;
     }
     waveMgr->enemiesKilled = 0;
     waveMgr->waveActive = true;
@@ -572,12 +591,6 @@ void spawnEnemyInWave(int waveNumber) {
             }
             formationIndex = (formationIndex + 1) % 18;
             break;
-            
-        case 4:
-            spawnPos.x = (float)GetRandomValue(100, (int)wb->width - 100);
-            spawnPos.y = (float)GetRandomValue(100, 300);
-            spawnShootingEnemy(spawnPos);
-            break;
     }
 }
 
@@ -618,7 +631,6 @@ void spawnFormationWave(int formationType, int count) {
         }
     }
 }
-
 
 void savingSettings(){
 	ofstream ustawienia("settings.txt");
@@ -1188,4 +1200,113 @@ void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mous
 			*Shop = false;
 		}
 	} else DrawText("Back", x_text_position, 100, 25, WHITE);
+}
+void spawnDropItem(Position pos, int type) {
+    Entity* drop = new Entity();
+    drop->add_component<Position>(pos);
+    drop->add_component<DropItem>({.type = type, .value = (type == 3) ? 1 : 5}); // 5 ammo lub 1 hp
+    
+    Texture2D tempTexture;
+    switch(type) {
+        case 1:
+            tempTexture = LoadTexture("surowka.png");
+            break;
+
+        case 2:
+            tempTexture = LoadTexture("surowka-black.png");
+            break;
+
+        case 3:
+            tempTexture = LoadTexture("hp_drop.png");
+            break;
+
+        default:
+            tempTexture = LoadTexture("surowka.png");
+    }
+    
+    drop->add_component<Render>({.txt = tempTexture});
+    
+    drop->add_component<Hitbox>({
+        .layer = HitboxLayer::Effects,
+        .interactsWith = HitboxLayer::Players,
+        .collisionBox = Area(Vec2(-15, -15), Vec2(15, 15)),
+        .receives = {create_component<Destroy>({})},
+        .applies = {create_component<CollectDrop>({.dropType = type})}
+    });
+    
+    drop->add_component<Velocity>({.x = 0, .y = 50});
+    
+    drop->add_component<DestroyBeyondWorld>({});
+    
+    entities->attach(drop);
+}
+
+void updateDropItems(float d) {}
+
+void collectDropItems() {
+    for (Entity* ent : entities->get()) {
+        auto collects = ent->get_components<CollectDrop>();
+        if (collects.empty()) continue;
+        
+        for (auto collect : collects) {
+            // Znajdź gracza
+            Entity* player = nullptr;
+            for (Entity* e : entities->get()) {
+                if (e->get_component<ArrowMovement>()) {
+                    player = e;
+                    break;
+                }
+            }
+            
+            if (!player) {
+                ent->remove_component<CollectDrop>();
+                continue;
+            }
+            
+            auto drop = ent->get_component<DropItem>();
+            if (!drop) {
+                drop = new DropItem();
+                drop->type = collect->dropType;
+                drop->value = (collect->dropType == 3) ? 1 : 5;
+            }
+            
+            switch(drop->type) {
+                case 1:
+                {
+                    auto ammoComp = resources->get_component<AmmoCounter>();
+                    if (ammoComp) {
+                        ammoComp->currentAmmo[1] += drop->value;
+                        if (ammoComp->currentAmmo[1] > 99) ammoComp->currentAmmo[1] = 99;
+                    }
+                    break;
+                }
+
+                case 2:
+                {
+                    auto ammoComp = resources->get_component<AmmoCounter>();
+                    if (ammoComp) {
+                        ammoComp->currentAmmo[2] += drop->value;
+                        if (ammoComp->currentAmmo[2] > 99) ammoComp->currentAmmo[2] = 99;
+                    }
+                    break;
+                }
+
+                case 3:
+                {
+                    auto playerHp = player->get_component<Hp>();
+                    if (playerHp) {
+                        if (playerHp->hp < 5) {
+                            playerHp->hp += drop->value;
+                            if (playerHp->hp > 5) playerHp->hp = 5;
+                    }
+                }
+                break;
+                }
+            }
+                  
+            ent->add_component<Destroy>({});
+        }
+        
+        ent->remove_component<CollectDrop>();
+    }
 }

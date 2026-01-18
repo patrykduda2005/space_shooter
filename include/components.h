@@ -148,3 +148,25 @@ void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 
 void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, bool* Shop, int* exit_int);
 void shopSystem(bool* Shop, bool* Pause, bool* Menu, bool* Datalog, Vector2 mousePosition);
 void savingSettings();
+typedef struct {
+    float cooldown;
+} EnemyShooting;
+
+void updateEnemyShooting(float d);
+
+typedef struct {
+    int type;
+    int value;
+} DropItem;
+
+typedef struct {
+    Texture txt;
+} ItemRender;
+
+void spawnDropItem(Position pos, int type);
+void updateDropItems(float d);
+void collectDropItems();
+
+typedef struct {
+    int dropType;
+} CollectDrop;

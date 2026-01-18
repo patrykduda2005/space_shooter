@@ -250,11 +250,8 @@ void spawnShootingEnemy(Position pos) {
     enemy->add_component<Render>({.txt = LoadTexture("strzelajacy_przeciwnik.png")});
     enemy->add_component<Velocity>({.x = 100, .y = 40});
     enemy->get_component<Hp>()->hp = 8;
-    
-    enemy->add_component<ShootingEnemyTag>({});
-    
-    //enemy->add_component<Shooting>({.cooldown = 0.0f});
-    
+    enemy->add_component<EnemyShooting>({.cooldown = 0.0f});
+
     entities->attach(enemy);
 }
 
@@ -271,32 +268,53 @@ void updateInvulnerability(float d) {
 }
 
 void updateShootingEnemies(float d) {
-    static float shootTimer = 0.0f;
-    static float shootInterval = 0.8f;
-    
-    shootTimer += d;
-    
-    if (shootTimer >= shootInterval) {
-        shootTimer = 0.0f;
+    for (Entity* ent : entities->get()) {
+        auto enemyShooting = ent->get_component<EnemyShooting>();
+        if (!enemyShooting) continue;
         
-        std::vector<Entity*> shootingEnemies;
-        for (Entity* ent : entities->get()) {
-            auto tag = ent->get_component<ShootingEnemyTag>();
-            if (tag) {
-                shootingEnemies.push_back(ent);
-            }
+        if (enemyShooting->cooldown > 0) {
+            enemyShooting->cooldown -= d;
         }
         
-        if (shootingEnemies.empty()) return;
+        if (enemyShooting->cooldown <= 0) {
+            auto pos = ent->get_component<Position>();
+            if (pos) {
+                Entity* bullet = createEnemyBullet(*pos);
+                
+                float randomX = (float)GetRandomValue(-50, 50);
+                if (auto vel = bullet->get_component<Velocity>()) {
+                    vel->x += randomX;
+                }
+                
+                entities->attach(bullet);
+                enemyShooting->cooldown = 2.0f;
+            }
+        }
+    }
+}
+
+void updateEnemyShooting(float d) {
+    for (Entity* ent : entities->get()) {
+        auto enemyShooting = ent->get_component<EnemyShooting>();
+        if (!enemyShooting) continue;
         
-        int randomIndex = GetRandomValue(0, shootingEnemies.size() - 1);
-        Entity* shooter = shootingEnemies[randomIndex];
+        if (enemyShooting->cooldown > 0) {
+            enemyShooting->cooldown -= d;
+        }
         
-        auto pos = shooter->get_component<Position>();
-        if (pos) {
-            
-            entities->attach(createEnemyBullet(*pos));
-            
+        if (enemyShooting->cooldown <= 0) {
+            auto pos = ent->get_component<Position>();
+            if (pos) {
+                Entity* bullet = createEnemyBullet(*pos);
+                
+                float randomX = (float)GetRandomValue(-50, 50);
+                if (auto vel = bullet->get_component<Velocity>()) {
+                    vel->x += randomX;
+                }
+                
+                entities->attach(bullet);
+                enemyShooting->cooldown = 2.0f;
+            }
         }
     }
 }
