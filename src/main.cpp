@@ -56,6 +56,7 @@ int main ()
     // spawnEnemy({.x = 300, .y = 300});
 
      spawnPlayer();
+     entities->attach(wall({.x = 500, .y = 200}));
 	// game loop
 	
 	auto keyb = resources->get_component<KeyBinds>();

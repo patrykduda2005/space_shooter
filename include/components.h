@@ -170,3 +170,6 @@ void collectDropItems();
 typedef struct {
     int dropType;
 } CollectDrop;
+
+typedef struct {
+} BounceOffObject;

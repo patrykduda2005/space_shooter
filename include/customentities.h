@@ -15,3 +15,4 @@ void spawnFormationEnemy(Position pos);
 void spawnStrongEnemy(Position pos);
 void spawnFastEnemy(Position pos);
 Entity* createEnemyBullet(Position pos);
+Entity* wall(Position pos);

@@ -318,3 +318,11 @@ void updateEnemyShooting(float d) {
         }
     }
 }
+
+Entity* wall(Position pos) {
+    Entity* wall = new Entity();
+    wall->add_component<Position>(pos);
+    wall->add_component<Render>({.txt = LoadTexture("wall.png")});
+    wall->add_component<BounceOffObject>({});
+    return wall;
+}
