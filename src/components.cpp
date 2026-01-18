@@ -9,6 +9,7 @@
 #include <fstream>
 using namespace std;
 
+
 void updateGravity(float d) {
     for (int i = 0; i < entities->get().size(); i++) {
         auto ent = entities->get()[i];
@@ -229,6 +230,12 @@ void destroy() {
     for (Entity *ent : entities->get()) {
         auto del = ent->get_component<Destroy>();
         if (!del) continue;
+        
+        if (ent->get_component<ArrowMovement>()) {
+            ent->remove_component<Destroy>();
+            continue;
+        }
+        
         entities->kill_entity(ent);
     }
 }
@@ -285,9 +292,20 @@ void damage() {
     for (Entity* ent : entities->get()) {
         auto dmg = ent->get_component<Damage>();
         auto hp = ent->get_component<Hp>();
+        auto invuln = ent->get_component<Invulnerable>();
+
+        if(invuln && invuln->timer > 0) {
+            ent->remove_component<Damage>();
+            continue;
+        }
+
         if (!dmg || !hp) continue;
         hp->hp -= dmg->dmg;
         ent->remove_component<Damage>();
+
+        if (ent->get_component<ArrowMovement>()) {
+            ent->add_component<Invulnerable>({.timer = 1.0f});
+        }
     }
 }
 
@@ -377,6 +395,199 @@ void suckToBlack(float d) {
                 suckeeVel->x += ((dystans.x / std::abs(dystans.x)) * d * black->g * 0.01)/dystans.x * dystans.x;
             if (dystans.y != 0)
                 suckeeVel->y += ((dystans.y / std::abs(dystans.y)) * d * black->g * 0.01)/dystans.y * dystans.y;
+        }
+    }
+}
+
+int getTotalEnemiesForWave(int wave) {
+    switch(wave) {
+        case 1:
+            return 5;
+
+        case 2:
+            return 8;
+
+        case 3:
+            return 3;
+
+        case 4:
+            return 5;
+
+        default:
+            return 0;
+    }
+}
+
+void checkWaveCompletion(WaveManager* waveMgr) {
+    int aliveEnemies = 0;
+    
+    for (Entity* ent : entities->get()) {
+        auto hitbox = ent->get_component<Hitbox>();
+        if (hitbox && (hitbox->layer & HitboxLayer::Enemies)) {
+            auto hp = ent->get_component<Hp>();
+            if (hp && hp->hp > 0) {
+                aliveEnemies++;
+            }
+        }
+    }
+
+    if (waveMgr->enemiesInWave == 0 && aliveEnemies == 0) {
+        waveMgr->waveActive = false;
+        waveMgr->waveTimer = 1.0f;
+        waveMgr->enemiesKilled = 0;
+    }
+}
+
+void startNextWave(WaveManager* waveMgr) {
+    static int lastWave = 0;
+    if (lastWave != waveMgr->currentWave) {
+        lastWave = waveMgr->currentWave;
+    }
+    waveMgr->currentWave++;
+
+    switch(waveMgr->currentWave) {
+        case 1:
+            waveMgr->enemiesInWave = 8;
+            break;
+
+        case 2:
+            waveMgr->enemiesInWave = 16;
+            break;
+
+        case 3:
+            waveMgr->enemiesInWave = 18;
+            break;
+
+        case 4:
+            waveMgr->enemiesInWave = 5;
+            break;
+    }
+    waveMgr->enemiesKilled = 0;
+    waveMgr->waveActive = true;
+    waveMgr->spawnTimer = 1.0f;
+}
+
+void updateWaveManager(float d) {
+    int i;
+    for (i = 0; i < entities->get().size(); i++) {
+        auto ent = entities->get()[i];
+        auto waveMgr = ent->get_component<WaveManager>();
+        if(!waveMgr) continue;
+
+        // Jesli fala jest aktywna
+        if(waveMgr->waveActive) {
+            waveMgr->spawnTimer -= d;
+
+            // Spawn nowego przeciwnika
+            if (waveMgr->spawnTimer <= 0 && waveMgr->enemiesInWave > 0) {
+                spawnEnemyInWave(waveMgr->currentWave);
+                waveMgr->enemiesInWave--;
+                waveMgr->spawnTimer = 0.3f;
+            }
+
+            checkWaveCompletion(waveMgr);
+        }
+        else {
+            // Oczekiwanie na nastepna fale
+            waveMgr->waveTimer -= d;
+            if (waveMgr->waveTimer <= 0) {
+                startNextWave(waveMgr);
+            }
+        }
+    }
+}
+
+void spawnEnemyInWave(int waveNumber) {
+    auto wb = resources->get_component<WorldBorder>();
+    if (!wb) return;
+    
+    static int formationIndex = 0;
+    Position spawnPos;
+    
+    switch(waveNumber) {
+        case 1:
+            spawnPos.x = (float)GetRandomValue(100, (int)wb->width - 100);
+            spawnPos.y = (float)GetRandomValue(100, 300);
+            spawnBasicEnemy(spawnPos);
+            formationIndex = (formationIndex + 1) % 8;
+            break;
+            
+        case 2:
+            if (formationIndex < 10) {
+                spawnPos.x = 100 + (formationIndex * 80);
+                if (formationIndex % 2 == 0) {
+                spawnPos.y = 170;
+                } else {
+                spawnPos.y = 270;
+                }
+                spawnTankEnemy(spawnPos);
+            } 
+            else if (formationIndex < 16) {
+                int shootingIndex = formationIndex - 10;
+                spawnPos.x = 150 + (shootingIndex * 120);
+                spawnPos.y = 70;
+                spawnShootingEnemy(spawnPos);
+            }
+            formationIndex = (formationIndex + 1) % 16;
+            break;
+            
+        case 3:
+            if (formationIndex < 10) {
+                spawnPos.x = (float)GetRandomValue(100, (int)wb->width - 100);
+                spawnPos.y = (float)GetRandomValue(100, 300);
+                spawnBasicEnemy(spawnPos);
+            }
+            else if (formationIndex < 18){
+                int shootingIndex = formationIndex - 10;
+                spawnPos.x = 80+ (shootingIndex * 120);
+                spawnPos.y = 50;
+                spawnShootingEnemy(spawnPos);
+            }
+            formationIndex = (formationIndex + 1) % 18;
+            break;
+            
+        case 4:
+            spawnPos.x = (float)GetRandomValue(100, (int)wb->width - 100);
+            spawnPos.y = (float)GetRandomValue(100, 300);
+            spawnShootingEnemy(spawnPos);
+            break;
+    }
+}
+
+void spawnFormationWave(int formationType, int count) {
+    auto wb = resources->get_component<WorldBorder>();
+    if (!wb) return;
+    
+    float startX = 100;
+    float spacingX = (wb->width - 200) / (count + 1);
+    
+    for (int i = 0; i < count; i++) {
+        Position pos;
+        
+        switch(formationType) {
+            case 1:
+                pos.x = startX + (spacingX * (i + 1));
+                pos.y = -100 - (i * 20);
+                spawnBasicEnemy(pos);
+                break;
+                
+            case 2:
+                pos.x = startX + (spacingX * (i + 1));
+                if (i % 2 == 0) {
+                    pos.y = -100;
+                } else {
+                    pos.y = -150;
+                }
+                spawnTankEnemy(pos);
+                break;
+                
+            case 3:
+                int row = i / 3;
+                int col = i % 3;
+                pos.x = (wb->width / 2) + (col - 1) * 150;
+                pos.y = -100 - (row * 100);
+                spawnShootingEnemy(pos);
+                break;
         }
     }
 }

@@ -50,12 +50,12 @@ int main ()
 	//WIELKI PIEC
 
 
-    spawnEnemy({.x = 500, .y = 500});
-    spawnEnemy({.x = 500, .y = 100});
-    spawnEnemy({.x = 200, .y = 300});
-    spawnEnemy({.x = 300, .y = 300});
+    // spawnEnemy({.x = 500, .y = 500});
+    // spawnEnemy({.x = 500, .y = 100});
+    // spawnEnemy({.x = 200, .y = 300});
+    // spawnEnemy({.x = 300, .y = 300});
 
-    spawnPlayer();
+     spawnPlayer();
 	// game loop
 	
 	auto keyb = resources->get_component<KeyBinds>();
@@ -67,6 +67,19 @@ int main ()
 
 	if(settingsComp->fps_index < 4) SetTargetFPS(std::stoi(fps[settingsComp->fps_index]));
 	else SetTargetFPS(0);
+
+
+	Entity* waveManager = entities->new_entity();
+	WaveManager wm;
+	wm.currentWave = 1;
+	wm.enemiesInWave = 8;
+	wm.enemiesKilled = 0;
+	wm.waveActive = true;
+	wm.waveTimer = 0.0f;
+	wm.spawnTimer = 0.5f;
+	waveManager->add_component<WaveManager>(wm);
+
+	std::cout << "WaveMangaer stworzony. Pierwsza fala za 3s..." << std::endl;
 
 	
 
@@ -129,6 +142,8 @@ int main ()
             spawn();
 		shoot(type);
 	   updateGravity(d);
+	   updateWaveManager(d);
+	   bounceOffWalls();
 		updateVelocity(d);
       renderThings(d);
       arrowMovement(d);
@@ -137,6 +152,8 @@ int main ()
       outlineColliders();
 		ammoCounter(type);
         displayhp();
+		updateInvulnerability(d);
+		updateShootingEnemies(d);
         damage();
         die();
         destroy();
@@ -161,6 +178,8 @@ int main ()
 		}
 		EndDrawing();
 	}
+	
+	
 
 	savingSettings();
 	unLoadResources();

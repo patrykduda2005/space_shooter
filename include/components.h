@@ -109,6 +109,39 @@ typedef struct {
 } SuckedToBlack;
 void suckToBlack(float d);
 
+typedef struct {
+    int currentWave;
+    int enemiesInWave;      
+    int enemiesSpawned;     
+    int enemiesKilled;
+    bool waveActive;
+    float waveTimer;
+    float spawnTimer;
+} WaveManager;
+
+void updateWaveManager(float d);
+void spawnEnemyInWave(int waveNumber);
+void spawnBasicEnemy(Position pos);
+void spawnTankEnemy(Position pos);
+void spawnShootingEnemy(Position pos);
+Entity* createEnemyBullet(Position pos);
+
+typedef struct {
+    float bounceStrength;
+} BounceOffWalls;
+
+void bounceOffWalls();
+
+typedef struct {
+    float timer;
+} Invulnerable;
+
+void updateInvulnerability(float d);
+
+typedef struct {
+} ShootingEnemyTag;
+
+void updateShootingEnemies(float d);
 void menuSystem(bool* Datalog, bool* Menu, bool* Sett, bool* Pause, bool* Shop, Vector2 mousePosition, int* exit_int);
 void settingsSystem(bool* Datalog, bool* Pause, bool* Menu, bool* Sett, Vector2 mousePosition, bool* KeybindsBtt);
 void pauseSystem(Vector2 mousePosition, bool* Pause, bool* Sett, bool* Menu, bool* Shop, int* exit_int);
