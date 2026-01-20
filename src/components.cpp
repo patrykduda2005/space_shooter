@@ -1043,7 +1043,7 @@ void menuSystem(bool* Datalog, bool* Menu, bool* Sett, bool* Pause, bool *Shop, 
 	int x_text_position;
 
 
-	if(Datalog){
+	if(*Datalog){
 		DrawText("x:", 50,700,15,WHITE);
 		DrawText(std::to_string(mousePosition.x).c_str(), 80,700,15,BLACK);
 		DrawText("y:", 175,700,15,WHITE);	
